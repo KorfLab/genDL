@@ -2,8 +2,11 @@
 
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras.callbacks import TensorBoard
 
 print(tf.__version__)
+
+tensorboard = TensorBoard(log_dir='logs/')
 
 fashion_mnist = keras.datasets.fashion_mnist
 
@@ -24,7 +27,7 @@ model.compile(optimizer='adam',
 	loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
 	metrics=['accuracy'])
 	
-model.fit(train_images, train_labels, epochs=3)
+model.fit(train_images, train_labels, epochs=3, callbacks=[tensorboard])
 
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
