@@ -25,3 +25,13 @@ not been seen in the RNASeq_splice data.
 
 All of the data comes from the + strand. This leaves the - strand as the
 testing set.
+
+| File            | Sequences |
+|:----------------|:----------|
+| acc.fake.txt    |  1663602  |
+| acc.lo.true.txt |   231802  |
+| acc.hi.true.txt |    54672  |
+| don.fake.txt    |  1543819  |
+| don.lo.true.txt |   243584  |
+| don.hi.true.txt |    54787  |
+
