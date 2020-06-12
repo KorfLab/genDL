@@ -2,6 +2,8 @@
 import argparse
 import sys
 import gzip
+import re
+import math
 
 parser = argparse.ArgumentParser(
 	description='PWM-based discriminator.')
@@ -24,6 +26,113 @@ def get_seqs(file, limit):
 			seqs.append(line.rstrip())
 			if len(seqs) == limit: break
 	return seqs
+
+def dkl(p, q):
+	d = 0
+	for i in p:
+		if p[i] != 0:
+			d += p[i] * math.log2(p[i]/q[i])
+	return d
+
+def make_regex(trues):
+	
+	sim = {
+		'A': {'A':0.97, 'C':0.01, 'G':0.01, 'T':0.01},
+		'C': {'A':0.01, 'C':0.97, 'G':0.01, 'T':0.01},
+		'G': {'A':0.01, 'C':0.01, 'G':0.97, 'T':0.01},
+		'T': {'A':0.01, 'C':0.01, 'G':0.01, 'T':0.97},
+		'R': {'A':0.49, 'C':0.01, 'G':0.49, 'T':0.01},
+		'Y': {'A':0.01, 'C':0.49, 'G':0.01, 'T':0.49},
+		'M': {'A':0.49, 'C':0.49, 'G':0.01, 'T':0.01},
+		'K': {'A':0.01, 'C':0.01, 'G':0.49, 'T':0.49},
+		'W': {'A':0.49, 'C':0.01, 'G':0.01, 'T':0.49},
+		'S': {'A':0.01, 'C':0.49, 'G':0.49, 'T':0.01},
+		'B': {'A':0.01, 'C':0.33, 'G':0.33, 'T':0.33},
+		'D': {'A':0.33, 'C':0.01, 'G':0.33, 'T':0.33},
+		'H': {'A':0.33, 'C':0.33, 'G':0.01, 'T':0.33},
+		'V': {'A':0.33, 'C':0.33, 'G':0.33, 'T':0.01},
+		'N': {'A':0.25, 'C':0.25, 'G':0.25, 'T':0.25},
+	}
+	
+	reg = {
+		'A': 'A',
+		'C': 'C',
+		'G': 'G',
+		'T': 'T',
+		'R': '[AG]',
+		'Y': '[CT]',
+		'M': '[AC]',
+		'K': '[GT]',
+		'W': '[AT]',
+		'S': '[GC]',
+		'B': '[CGT]',
+		'D': '[AGT]',
+		'H': '[ACT]',
+		'V': '[ACG]',
+		'N': '.',
+	}
+	
+	# build regex from pwm
+	pwm = make_pwm(trues)
+	ntstr = ''
+	restr = ''
+	for i in range(len(pwm)):
+		min_d = 1e6
+		min_nt = None
+		for nt in sim:
+			d = dkl(pwm[i], sim[nt])
+			if d < min_d:
+				min_d = d
+				min_nt = nt
+		ntstr += min_nt
+		restr += reg[min_nt]
+	
+	return restr, ntstr
+
+def regex(trues, fakex, xv):
+
+	sys.stderr.write('\nregex\n')
+	TPR, TNR, PPV, NPV = 0, 0, 0, 0
+	for x in range(xv):
+
+		# collect testing and training sets
+		ttrain, ttest, ftrain, ftest = [], [], [], []
+		for i in range(len(trues)):
+			if i % xv == x: ttest.append(trues[i])
+			else:           ttrain.append(trues[i])
+		for i in range(len(fakes)):
+			if i % xv == x: ftest.append(fakes[i])
+			else:           ftrain.append(fakes[i])
+
+		# make regex
+		restr, ntstr = make_regex(ttrain)
+		
+		# score against test set
+		tp, tn, fp, fn = 0, 0, 0, 0
+		for seq in ttest:
+			match = re.search(restr, seq)
+			#print(match)
+			if match != None: tp += 1
+			else:             fn += 1
+
+		for seq in ftest:
+			match = re.search(restr,seq)
+			if match != None: fp += 1
+			else:             tn += 1
+
+		# gather performance stats
+		tpr = tp / (tp + fn)
+		tnr = tn / (tn + fp)
+		ppv = tp / (tp + fp)
+		npv = tn / (tn + fn)
+
+		sys.stderr.write(f'set-{x} {ntstr} {tpr:.3f} {tnr:.3f} {ppv:.3f} {npv:.3f}\n')
+		TPR += tpr
+		TNR += tnr
+		PPV += ppv
+		NPV += npv
+
+	return (TPR+PPV)/(xv*2)
 
 def make_pwm(seqs, boost=None):
 
@@ -148,6 +257,19 @@ def kmer_threshold(trues, fakes, xv):
 	
 	return max_k_acc/xv
 
+def pwm_evaluate(pwm, t, tsites, fsites):
+	tp, tn, fp, fn = 0, 0, 0, 0
+	for seq in tsites:
+		s = score_pwm(seq, pwm)
+		if s > t: tp += 1
+		else:     fn += 1
+	for i in range(len(tsites)): # fakes could be bigger, so limit
+		seq = fsites[i]
+		s = score_pwm(seq, pwm)
+		if s > t: fp += 1
+		else:     tn += 1
+	return tp, tn, fp, fn
+
 def pwm_threshold(trues, fakes, xv):
 
 	sys.stderr.write('\npwm_threshold\n')
@@ -177,31 +299,27 @@ def pwm_threshold(trues, fakes, xv):
 		t = tmax
 		n = 0
 		acc_max = 0
+		self_max = None
 		while True:
 			t /= 2
 			if t < tmin: break # no sense going below tmin
 			
+			# score against training set (check overtraining)
+			stp, stn, sfp, sfn = pwm_evaluate(pwm, t, train, fakes)
+			
 			# score against test set
-			tp, tn, fp, fn = 0, 0, 0, 0
-			for seq in test:
-				s = score_pwm(seq, pwm)
-				if s > t: tp += 1
-				else:     fn += 1
-			for i in range(len(test)): # fakes could be bigger, so limit
-				seq = fakes[i]
-				s = score_pwm(seq, pwm)
-				if s > t: fp += 1
-				else:     tn += 1
-	
-			if tp:
+			tp, tn, fp, fn = pwm_evaluate(pwm, t, test, fakes)
+			if tp and stp:
 				tpr = tp / (tp + fn)
 				ppv = tp / (tp + fp)
 				acc = (tpr + ppv) / 2
-				if acc > acc_max: acc_max = acc
-				sys.stderr.write(f'x')
-			else:
-				sys.stderr.write(f'.')
-		sys.stderr.write(f' {t} {acc_max}\n')
+				if acc > acc_max:
+					acc_max = acc
+					ssn = stp / (stp + sfn)
+					ssp = stp / (stp + sfp)
+					self_max = (ssn + ssp) / 2
+
+		sys.stderr.write(f' train:{self_max} test:{acc_max}\n')
 		sum_acc += acc_max
 		
 	return sum_acc / xv
@@ -331,15 +449,18 @@ if __name__ == '__main__':
 	trues = get_seqs(arg.true, arg.n)
 	fakes = get_seqs(arg.fake, arg.n)
 	
+	acc0 = regex(trues, fakes, arg.x)
+	print(f'REGEX: {acc0:.4f}')
+	
 	acc1 = pwm_threshold(trues, fakes, arg.x)	
 	print(f'PWM Threshold: {acc1:.4f}')
 	
 	acc2 = pwm_vs_pwm(trues, fakes, arg.x)
 	print(f'PWM vs. PWM: {acc2:.4f}')
 	
-#	acc3 = boosted_pwms(trues, fakes, arg.x)
-#	print(f'Boosted PWMs: {acc3:.4f}')
+	acc3 = boosted_pwms(trues, fakes, arg.x)
+	print(f'Boosted PWMs: {acc3:.4f}')
 	
-#	acc4 = kmer_threshold(trues, fakes, arg.x)
-#	print(f'KMER Threshold: {acc4:.4f}')
+	acc4 = kmer_threshold(trues, fakes, arg.x)
+	print(f'KMER Threshold: {acc4:.4f}')
 
