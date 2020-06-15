@@ -20,7 +20,7 @@ def write_file(name, seqs):
 
 threshold = 1000
 flank = 20
-genome = Reader(fasta='wb276.fa', gff='wb276.gff3')
+genome = Reader(fasta='ce.fa.gz', gff='ce.gff3.gz')
 sd_hi = {}   # splice donors above threshold
 sd_lo = {}   # splice donors below threshold
 sd_fake = {} # fake splice donors
