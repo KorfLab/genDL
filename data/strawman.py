@@ -2,7 +2,6 @@
 
 import argparse
 import sys
-import gzip
 import re
 import math
 
@@ -22,7 +21,7 @@ arg = parser.parse_args()
 
 def get_seqs(file, limit):
 	seqs = []
-	with gzip.open(file, 'rt') as fp:
+	with open(file) as fp:
 		for line in fp.readlines():
 			seqs.append(line.rstrip())
 			if len(seqs) == limit: break

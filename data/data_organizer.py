@@ -17,10 +17,22 @@ def write_file(name, seqs):
 			fp.write(seq)
 			fp.write('\n')
 
+parser = argparse.ArgumentParser(
+	description='Creates data sets for splice investigation.')
+parser.add_argument('--fasta', required=True, type=str,
+	metavar='<path>', help='.gz file of true sequences')
+parser.add_argument('--gff3', required=True, type=str,
+	metavar='<path>', help='.gz file of fake sequences')
+parser.add_argument('--lo', required=False, type=int, default=1000,
+	metavar='<int>', help='lo count threshold [%(default)i]')
+parser.add_argument('--flank', required=False, type=int, default=20,
+	metavar='<int>', help='cross-validation level [%(default)i]')
+arg = parser.parse_args()
 
-threshold = 1000
-flank = 20
-genome = Reader(fasta='ce.fa.gz', gff='ce.gff3.gz')
+
+threshold = arg.lo
+flank = arg.flank
+genome = Reader(fasta=arg.fasta, gff=arg.gff3)
 sd_hi = {}   # splice donors above threshold
 sd_lo = {}   # splice donors below threshold
 sd_fake = {} # fake splice donors
