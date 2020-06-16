@@ -17,10 +17,22 @@ def write_file(name, seqs):
 			fp.write(seq)
 			fp.write('\n')
 
+parser = argparse.ArgumentParser(
+	description='Creates data sets for splice investigation.')
+parser.add_argument('--fasta', required=True, type=str,
+	metavar='<path>', help='.gz file of worm chromosomes')
+parser.add_argument('--gff3', required=True, type=str,
+	metavar='<path>', help='.gz file of worm annotations')
+parser.add_argument('--lo', required=False, type=int, default=1000,
+	metavar='<int>', help='lo count threshold [%(default)i]')
+parser.add_argument('--flank', required=False, type=int, default=20,
+	metavar='<int>', help='flanking sequence [%(default)i]')
+arg = parser.parse_args()
 
-threshold = 1000
-flank = 20
-genome = Reader(fasta='wb276.fa', gff='wb276.gff3')
+
+threshold = arg.lo
+flank = arg.flank
+genome = Reader(fasta=arg.fasta, gff=arg.gff3)
 sd_hi = {}   # splice donors above threshold
 sd_lo = {}   # splice donors below threshold
 sd_fake = {} # fake splice donors
@@ -60,12 +72,12 @@ for chrom in genome:
 				if n2 == 'GT':
 					db, de = i-flank, i+flank+2
 					don = seq[db:de]
-					if don not in seen:
+					if don not in seen and len(don) == flank * 2 + 2:
 						sd_fake[don] = True
 				elif n2 == 'AG':
-					ab, ae = i-20, i+22
+					ab, ae = i-flank, i+flank+2
 					acc = seq[ab:ae]
-					if acc not in seen:
+					if acc not in seen and len(acc) == flank * 2 + 2:
 						sa_fake[acc] = True
 
 # outputs
