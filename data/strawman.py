@@ -74,6 +74,7 @@ def make_regex(trues):
 	
 	# build regex from pwm
 	pwm = make_pwm(trues)
+	print(pwm)
 	ntstr = ''
 	restr = ''
 	for i in range(len(pwm)):

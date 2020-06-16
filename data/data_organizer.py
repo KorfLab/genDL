@@ -20,13 +20,13 @@ def write_file(name, seqs):
 parser = argparse.ArgumentParser(
 	description='Creates data sets for splice investigation.')
 parser.add_argument('--fasta', required=True, type=str,
-	metavar='<path>', help='.gz file of true sequences')
+	metavar='<path>', help='.gz file of worm chromosomes')
 parser.add_argument('--gff3', required=True, type=str,
-	metavar='<path>', help='.gz file of fake sequences')
+	metavar='<path>', help='.gz file of worm annotations')
 parser.add_argument('--lo', required=False, type=int, default=1000,
 	metavar='<int>', help='lo count threshold [%(default)i]')
 parser.add_argument('--flank', required=False, type=int, default=20,
-	metavar='<int>', help='cross-validation level [%(default)i]')
+	metavar='<int>', help='flanking sequence [%(default)i]')
 arg = parser.parse_args()
 
 
