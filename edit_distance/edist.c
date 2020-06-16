@@ -14,12 +14,13 @@ int edit_distance(char *s1, char *s2, int len) {
 int main (int argc, char ** argv) {
 	FILE *fp;
 	char line[100];
-	int count = 0;
+	int i, j, count, len;
 	char ** seqs;
-	int len = 0;
-	int i, j, d, sum, comps;
+	long d, sum, comps;
 	
 	/* get the number of sequences and length */
+	count = 0;
+	len = 0;
 	fp = fopen(argv[1], "r");
 	while(fgets(line, sizeof(line), fp)) {
 		count += 1;
@@ -54,7 +55,7 @@ int main (int argc, char ** argv) {
 	}
 	
 	/* report stats */
-	printf("%d %d %f\n", sum, comps, (double)sum/comps);
+	printf("%zu %zu %f\n", sum, comps, (double)sum/comps);
 
 }
 
