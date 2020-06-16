@@ -40,16 +40,29 @@ print(truelabel.shape, fakelabel.shape)
 
 model = keras.Sequential([
 	keras.layers.Flatten(input_shape=(42,4)),
-	keras.layers.Dense(82, activation='relu'),
-	keras.layers.Dense(42, activation='relu'),
+	keras.layers.Dense(84, activation='elu', 
+		kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+	keras.layers.Dropout(0.50),
+	keras.layers.Dense(42, activation='elu',
+		kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+	keras.layers.Dropout(0.50),
+	keras.layers.Dense(21, activation='elu',
+		kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+	keras.layers.Dropout(0.25),
+	keras.layers.Dense(10, activation='elu',
+		kernel_regularizer=tf.keras.regularizers.l2(0.0001)),
+#	keras.layers.Dropout(0.25),
+	keras.layers.Dense(5, activation='elu',
+		kernel_regularizer=tf.keras.regularizers.l2(0.0001)),
+#	keras.layers.Dropout(0.25),
 	keras.layers.Dense(2, activation='softmax')
 ])
 
-model.compile(optimizer='adam',
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
 	loss=tf.keras.losses.CategoricalCrossentropy(),
-	metrics=['accuracy'])
+	metrics=['accuracy',tf.keras.metrics.Precision(),tf.keras.metrics.Recall()])
 	
-model.fit(seqs, labels, epochs=10, batch_size=1, validation_split=0.20)
+model.fit(seqs, labels, epochs=30, batch_size=1, validation_split=0.20)
 """
 test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
