@@ -72,12 +72,12 @@ for chrom in genome:
 				if n2 == 'GT':
 					db, de = i-flank, i+flank+2
 					don = seq[db:de]
-					if don not in seen:
+					if don not in seen and len(don) == flank * 2 + 2:
 						sd_fake[don] = True
 				elif n2 == 'AG':
-					ab, ae = i-20, i+22
+					ab, ae = i-flank, i+flank+2
 					acc = seq[ab:ae]
-					if acc not in seen:
+					if acc not in seen and len(acc) == flank * 2 + 2:
 						sa_fake[acc] = True
 
 # outputs
