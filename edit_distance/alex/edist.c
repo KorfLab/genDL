@@ -96,6 +96,8 @@ int main(int argc, char **argv) {
 		for (j = i + 1; j < count; j++) {
 			d = 0;
 			for (k = 0; k < chunks; k++) {
+				// gcc built-in function (counts the number of 1s in the string)
+				// divide by 2 because each mismatched base pair causes two 1s to appear
 				d += __builtin_popcountll(seqs[i][k] ^ seqs[j][k]) / 2;
 			}
 			sum += d;
