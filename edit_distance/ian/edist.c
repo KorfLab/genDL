@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 int edit_distance(char *s1, char *s2, int len) {
 	int i, d;
@@ -12,6 +13,9 @@ int edit_distance(char *s1, char *s2, int len) {
 }
 
 int main (int argc, char ** argv) {
+
+	clock_t begin_pre = clock();
+
 	FILE *fp;
 	char line[100];
 	int i, j, count, len;
@@ -43,6 +47,7 @@ int main (int argc, char ** argv) {
 	}
 	fclose(fp);
 	
+	clock_t begin_comp = clock();
 	/* do comparisons */
 	sum = 0;
 	comps = 0;
@@ -53,9 +58,13 @@ int main (int argc, char ** argv) {
 			comps++;
 		}
 	}
+	clock_t end = clock();
 	
 	/* report stats */
 	printf("%zu %zu %f\n", sum, comps, (double)sum/comps);
+	printf("Preprocessing time: %.6f s\n",  (double)(begin_comp - begin_pre) / CLOCKS_PER_SEC);
+	printf("Comparison time: %.6f s\n",  (double)(end - begin_comp) / CLOCKS_PER_SEC);
+	printf("Total time: %.6f s\n", (double)(end - begin_pre) / CLOCKS_PER_SEC);
 
 }
 
