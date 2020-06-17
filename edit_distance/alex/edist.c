@@ -8,8 +8,12 @@
 
 int encode_nt(char nt) {
 	/* 
-	 * any of these values XORed with any other of these values
-	 * gives a result with exactly two "1" bits set.
+	 *  Each nucleotide is represented by 4 bits.
+	 *  Any of the encoded values XORed with any other of these values
+	 *  gives a result with exactly two "1" bits set.
+	 * 
+	 *  e.g. AT ^ AA = 00010100 ^ 00010001 = 00000101 
+	 *  -> 2 bits set -> distance = 2/1 = 1
 	 */
 	switch(nt) {
 		case 'A':	return 1;
@@ -29,8 +33,10 @@ int main(int argc, char **argv) {
 	char line[100];
 	int i, j, k, count, len, chunks;
 
-	/* Each sequence is represented by chunks of 8-byte integers.
-	 * A 64-bit processor can XOR a pair of such chunks in one cycle.
+	/* 
+	 *  Each sequence is represented by chunks of 8-byte integers containing
+	 *  16 4-bit nucleotides. A 64-bit processor can XOR a pair of such chunks
+	 *  in one cycle. Counting the number of 1s in the result gives the edit distance.
 	 */
 	uint64_t ** seqs;
 	long d, sum, comps;
@@ -75,7 +81,7 @@ int main(int argc, char **argv) {
 				if (pos >= len) {
 					break;
 				}
-				/* set the k-th byte of the chunk to the encoded nt */
+				/* set the k-th 4-bit segment of the chunk to the encoded nt */
 				nt = encode_nt(line[pos]);
 				mask = (uint64_t) 0b1111 << 4*k;
 				new =  nt << 4*k;
@@ -96,8 +102,8 @@ int main(int argc, char **argv) {
 		for (j = i + 1; j < count; j++) {
 			d = 0;
 			for (k = 0; k < chunks; k++) {
-				// gcc built-in function (counts the number of 1s in the string)
-				// divide by 2 because each mismatched base pair causes two 1s to appear
+				//  gcc built-in function (counts the number of 1s in the string)
+				//  divide by 2 because each mismatched base pair causes two 1s to appear
 				d += __builtin_popcountll(seqs[i][k] ^ seqs[j][k]) / 2;
 			}
 			sum += d;
