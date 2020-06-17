@@ -12,7 +12,7 @@ int encode_nt(char nt) {
 	 *  Any of the encoded values XORed with any other of these values
 	 *  gives a result with exactly two "1" bits set.
 	 * 
-	 *  e.g. AT ^ AA = 00010100 ^ 00010001 = 00000101 
+	 *  e.g. AG ^ AA = 00010100 ^ 00010001 = 00000101 
 	 *  -> 2 bits set -> distance = 2/1 = 1
 	 */
 	switch(nt) {
