@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
+
+int THREADS;
 
 int edit_distance(char *s1, char *s2, int len) {
 	int i, d;
@@ -11,12 +14,56 @@ int edit_distance(char *s1, char *s2, int len) {
 	return d;
 }
 
+typedef struct _thread_data_t {
+	int tid;
+	int job;
+	int count;
+	int len;
+	char ** seqs;
+	long sum;
+	long comps;
+} thread_data_t;
+
+void *thr_func (void *arg) {
+	int i, j, d;
+	thread_data_t *data = (thread_data_t *)arg;
+	
+	printf("working in thread id: %d\n", data->tid);
+	data->sum = 0;
+	data->comps = 0;
+	for (i = 0; i < data->count; i++) {
+		if (i % THREADS != data->tid) continue;		
+		for (j = i + 1; j < data->count; j++) {
+			d = edit_distance(data->seqs[i], data->seqs[j], data->len-1);
+			data->sum += d;
+			data->comps++;
+		}
+	}
+	
+	printf("%d: %zu %zu %f\n", data->tid, data->sum, data->comps, (double)data->sum/data->comps);
+	
+	
+	pthread_exit(NULL);
+}
+
 int main (int argc, char ** argv) {
+	/* usage */
+	if (argc != 3) {
+		fprintf(stderr, "usage: %s <file> <threads>\n", argv[0]);
+		exit(1);
+	}
+	char *filename = argv[1];
+	THREADS = atoi(argv[2]);
+
+	/* variables */
 	FILE *fp;
 	char line[100];
-	int i, j, count, len;
+	int i, count, len;
 	char ** seqs;
-	long d, sum, comps;
+	long sum, comps;
+	pthread_t thr[THREADS];
+	int rc;
+	thread_data_t thr_data[THREADS];
 	
 	/* get the number of sequences and length */
 	count = 0;
@@ -35,7 +82,7 @@ int main (int argc, char ** argv) {
 	}
 	
 	/* store all sequences */
-	fp = fopen(argv[1], "r");
+	fp = fopen(filename, "r");
 	i = 0;
 	while(fgets(line, sizeof(line), fp)) {
 		strcpy(seqs[i], line);
@@ -43,21 +90,28 @@ int main (int argc, char ** argv) {
 	}
 	fclose(fp);
 	
-	/* do comparisons */
-	sum = 0;
-	comps = 0;
-	for (i = 0; i < count; i++) {
-		for (j = i + 1; j < count; j++) {
-			d = edit_distance(seqs[i], seqs[j], len-1);
-			sum += d;
-			comps++;
+	/* working */
+	for (i = 0; i < THREADS; ++i) {
+		thr_data[i].tid = i;
+		thr_data[i].count = count;
+		thr_data[i].seqs = seqs;
+		thr_data[i].len = len;
+		if ((rc = pthread_create(&thr[i], NULL, thr_func, &thr_data[i]))) {
+			fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+			return EXIT_FAILURE;
 		}
 	}
 	
-	/* report stats */
-	printf("%zu %zu %f\n", sum, comps, (double)sum/comps);
+	/* collecting */
+	sum = 0;
+	comps = 0;
+	for (i = 0; i < THREADS; ++i) {
+		pthread_join(thr[i], NULL);
+		sum += thr_data[i].sum;
+		comps += thr_data[i].comps;
+	}
+
+	printf("%d %zu %zu %.3f\n", count, sum, comps, (double)sum/comps);
 
 }
-
-
 
