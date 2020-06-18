@@ -12,7 +12,7 @@ CFLAGS = -O2 -Wall -Werror
 ###########
 
 $(APP1): $(SRC1) $(LIBS)
-	gcc -Wall -Werror -o $(APP1) $(SRC1) $(IK) -lm -O2
+	gcc -Wall -Werror -o $(APP1) $(SRC1) $(IK) -lm -O2 -fopenmp
 
 clean:
 	rm -f *.o $(APP1)

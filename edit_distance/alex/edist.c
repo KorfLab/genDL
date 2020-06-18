@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <omp.h>
+
+/*  Run `export OMP_NUM_THREADS=<?>` with a chosen value before running
+ *  (8 works best for me).
+ */
 
 int encode_nt(char nt) {
 	/* 
@@ -27,8 +32,6 @@ int encode_nt(char nt) {
 
 int main(int argc, char **argv) {
 
-	clock_t begin_pre = clock();
-
 	FILE *fp;
 	char line[100];
 	int i, j, k, count, len, chunks;
@@ -39,8 +42,8 @@ int main(int argc, char **argv) {
 	 *  in one cycle. Counting the number of 1s in the result gives the edit distance.
 	 */
 	uint64_t ** seqs;
-	long d, sum, comps;
-	
+	long glob_sum, glob_comps;
+
 	/* get the number of sequences and length */
 	count = 0;
 	len = 0;
@@ -63,6 +66,7 @@ int main(int argc, char **argv) {
 	/* allocate storage */
 	seqs = malloc(count * sizeof(uint64_t *));
 
+	#pragma omp for
 	for (i = 0; i < count; i++) {
 		seqs[i] = malloc(chunks * sizeof(uint64_t));
 	}
@@ -94,31 +98,44 @@ int main(int argc, char **argv) {
 	fclose(fp);
 
 	/* perform comparisons */
-	clock_t begin_comp = clock();
 
-	sum = 0;
-	comps = 0;
-	for (i = 0; i < count; i++) {
-		for (j = i + 1; j < count; j++) {
-			d = 0;
-			for (k = 0; k < chunks; k++) {
-				//  gcc built-in function (counts the number of 1s in the string)
-				//  divide by 2 because each mismatched base pair causes two 1s to appear
-				d += __builtin_popcountll(seqs[i][k] ^ seqs[j][k]) / 2;
+	// parallelize using OpenMP
+	long priv_sum, priv_comps;
+
+	glob_sum = 0;
+	glob_comps = 0;
+	#pragma omp parallel private(priv_sum, priv_comps) // these are private per thread
+	{
+		priv_sum = 0;
+		priv_comps = 0;
+		#pragma omp for
+		for (i = 0; i < count; i++) {
+			for (j = i + 1; j < count; j++) {
+				for (k = 0; k < chunks; k++) {
+					/* 
+					*  gcc built-in function (counts the number of 1s in the 
+					*  string). Divide by 2 because each mismatched base pair
+					*  causes two 1s to appear.
+					*/
+					priv_sum += __builtin_popcountll(seqs[i][k] ^ seqs[j][k]) / 2;
+				}
+				priv_comps++;
 			}
-			sum += d;
-			comps++;
 		}
+		#pragma omp critical
+		{
+			glob_sum += priv_sum;
+			glob_comps += priv_comps;
+		}
+	}
+
+	#pragma omp for
+	for(i = 0; i < count; i++) {
 		free(seqs[i]);
 	}
 	free(seqs);
 
-	clock_t end = clock();
-
 	 /* report stats */
-	printf("%zu %zu %f\n", sum, comps, (double)sum/comps);
-	printf("Preprocessing time: %.6f s\n",  (double)(begin_comp - begin_pre) / CLOCKS_PER_SEC);
-	printf("Comparison time: %.6f s\n",  (double)(end - begin_comp) / CLOCKS_PER_SEC);
-	printf("Total time: %.6f s\n", (double)(end - begin_pre) / CLOCKS_PER_SEC);
+	printf("%zu %zu %f\n", glob_sum, glob_comps, (double)glob_sum/glob_comps);
 
 }
