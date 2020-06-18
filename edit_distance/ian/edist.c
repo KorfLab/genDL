@@ -28,7 +28,7 @@ void *thr_func (void *arg) {
 	int i, j, d;
 	thread_data_t *data = (thread_data_t *)arg;
 	
-	printf("working in thread id: %d\n", data->tid);
+	fprintf(stderr, "working in thread id: %d\n", data->tid);
 	data->sum = 0;
 	data->comps = 0;
 	for (i = 0; i < data->count; i++) {
@@ -40,7 +40,7 @@ void *thr_func (void *arg) {
 		}
 	}
 	
-	printf("%d: %zu %zu %f\n", data->tid, data->sum, data->comps, (double)data->sum/data->comps);
+	fprintf(stderr, "%d: %zu %zu %f\n", data->tid, data->sum, data->comps, (double)data->sum/data->comps);
 	
 	
 	pthread_exit(NULL);
