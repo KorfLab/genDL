@@ -5,7 +5,7 @@
 APP1 = edist
 SRC1 = edist.c
 
-CFLAGS = -O2 -Wall -Werror
+CFLAGS = -O2 -Wall -Werror -march=native
 
 ###########
 # Targets #
