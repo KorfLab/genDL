@@ -16,7 +16,6 @@ int edit_distance(char *s1, char *s2, int len) {
 
 typedef struct _thread_data_t {
 	int tid;
-	int job;
 	int count;
 	int len;
 	char ** seqs;
@@ -41,7 +40,6 @@ void *thr_func (void *arg) {
 	}
 	
 	fprintf(stderr, "%d: %zu %zu %f\n", data->tid, data->sum, data->comps, (double)data->sum/data->comps);
-	
 	
 	pthread_exit(NULL);
 }
@@ -113,5 +111,6 @@ int main (int argc, char ** argv) {
 
 	printf("%d %zu %zu %.3f\n", count, sum, comps, (double)sum/comps);
 
+	exit(0);
 }
 
