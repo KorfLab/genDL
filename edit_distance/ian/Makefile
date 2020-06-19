@@ -12,7 +12,7 @@ CFLAGS = -O2 -Wall -Werror -march=native
 ###########
 
 $(APP1): $(SRC1) $(LIBS)
-	gcc -O2 -Wall -Werror -o $(APP1) $(SRC1) $(IK) -lm
+	gcc -O2 -Wall -Werror -o $(APP1) $(SRC1) $(IK) -lm -lpthread
 
 clean:
 	rm -f *.o $(APP1)
