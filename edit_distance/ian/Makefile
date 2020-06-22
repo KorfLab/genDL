@@ -1,18 +1,18 @@
-#######################
-# Makefile for edist  #
-#######################
+######################
+# Makefile for edist #
+######################
 
 APP1 = edist
 SRC1 = edist.c
 
-CFLAGS = -O2 -Wall -Werror -march=native
+CFLAGS = -O3 -march=native -Wall -Werror -march=native
 
 ###########
 # Targets #
 ###########
 
 $(APP1): $(SRC1) $(LIBS)
-	gcc -O2 -Wall -Werror -o $(APP1) $(SRC1) $(IK) -lm
+	gcc $(CFLAGS) -o $(APP1) $(SRC1) -lm -lpthread
 
 clean:
 	rm -f *.o $(APP1)
