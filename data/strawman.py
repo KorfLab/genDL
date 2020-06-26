@@ -4,6 +4,7 @@ import argparse
 import sys
 import re
 import math
+import gzip
 
 parser = argparse.ArgumentParser(
 	description='PWM-based discriminator.')
@@ -21,7 +22,7 @@ arg = parser.parse_args()
 
 def get_seqs(file, limit):
 	seqs = []
-	with open(file) as fp:
+	with gzip.open(file, mode='rt') as fp:
 		for line in fp.readlines():
 			seqs.append(line.rstrip())
 			if len(seqs) == limit: break
@@ -74,7 +75,6 @@ def make_regex(trues):
 	
 	# build regex from pwm
 	pwm = make_pwm(trues)
-	print(pwm)
 	ntstr = ''
 	restr = ''
 	for i in range(len(pwm)):
@@ -459,9 +459,9 @@ if __name__ == '__main__':
 	acc2 = pwm_vs_pwm(trues, fakes, arg.x)
 	print(f'PWM vs. PWM: {acc2:.4f}')
 	
-	acc3 = boosted_pwms(trues, fakes, arg.x)
-	print(f'Boosted PWMs: {acc3:.4f}')
+#	acc3 = boosted_pwms(trues, fakes, arg.x)
+#	print(f'Boosted PWMs: {acc3:.4f}')
 	
-	acc4 = kmer_threshold(trues, fakes, arg.x)
-	print(f'KMER Threshold: {acc4:.4f}')
+#	acc4 = kmer_threshold(trues, fakes, arg.x)
+#	print(f'KMER Threshold: {acc4:.4f}')
 
