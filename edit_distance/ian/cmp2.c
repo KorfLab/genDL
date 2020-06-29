@@ -5,12 +5,15 @@
 
 int edit_distance(const char *s1, const char *s2, int len) {
 	int i, d;
+	
 	d = 0;
 	for (i = 0; i < len; i++) {
 		if (s1[i] != s2[i]) d++;
 	}
+		
 	return d;
 }
+
 typedef struct _seq_data_t {
 	int len;
 	int count;
@@ -50,6 +53,7 @@ seq_data_t read_seqs(char *filename) {
 	}
 	fclose(fp);
 	
+	/* return struct */
 	data.name = filename;
 	data.len = len;
 	data.count = count;
@@ -58,17 +62,14 @@ seq_data_t read_seqs(char *filename) {
 }
 
 void compare_seqs(const seq_data_t s1, const seq_data_t s2, char mode) {
-	int i, j, d, start;
-	long *hist = malloc(s1.len * sizeof(long));
-	long sum, total;
+	int i, j, s, d;
+	long *hist = calloc(s1.len, sizeof(long));
+	long sum = 0, total = 0;
 	
-	for (i = 0; i < s1.len; i++) hist[i] = 0;
-	
-	sum = 0;
-	total = 0;
+	/* compare all sequences in half or full matrix */
 	for (i = 0; i < s1.count; i++) {
-		start = (mode == 'h') ? i + 1 : 0;
-		for (j = start; j < s2.count; j++) {
+		s = (mode == 'h') ? i + 1 : 0;
+		for (j = s; j < s2.count; j++) {
 			d = edit_distance(s1.seqs[i], s2.seqs[j], s1.len);
 			hist[d]++;
 			sum += d;
@@ -76,6 +77,7 @@ void compare_seqs(const seq_data_t s1, const seq_data_t s2, char mode) {
 		}
 	}
 	
+	/* output */
 	printf("\n%s vs. %s\n", s1.name, s2.name);
 	printf("ave: %f\n", (double)sum/total);
 	for (i = 0; i < s1.len; i++) {
