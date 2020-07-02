@@ -48,6 +48,7 @@ seq_data_t read_seqs(char *filename) {
 	fp = fopen(filename, "r");
 	i = 0;
 	while(fgets(line, sizeof(line), fp)) {
+		line[len-1] = '\0';
 		strcpy(seqs[i], line);
 		i++;
 	}
@@ -61,23 +62,30 @@ seq_data_t read_seqs(char *filename) {
 	return data;
 }
 
-void compare_seqs(const seq_data_t s1, const seq_data_t s2, char mode) {
+void compare_seqs(const seq_data_t s1, const seq_data_t s2,
+	char mode, int t) {
 	int i, j, s, d;
 	long *hist = calloc(s1.len, sizeof(long));
 	long sum = 0, total = 0;
 	
 	/* compare all sequences in half or full matrix */
+	printf("\n%s vs %s closer than %d\n", s1.name, s2.name, t);
 	for (i = 0; i < s1.count; i++) {
 		s = (mode == 'h') ? i + 1 : 0;
 		for (j = s; j < s2.count; j++) {
 			d = edit_distance(s1.seqs[i], s2.seqs[j], s1.len);
+			
+			/* output that is a little too close */
+			if (d < t) {
+				printf("%d %s %s\n", d, s1.seqs[i], s2.seqs[j]);
+			}
 			hist[d]++;
 			sum += d;
 			total++;
 		}
 	}
 	
-	/* output */
+	/* histogram output */
 	printf("\n%s vs. %s\n", s1.name, s2.name);
 	printf("ave: %f\n", (double)sum/total);
 	for (i = 0; i < s1.len; i++) {
@@ -90,12 +98,13 @@ void compare_seqs(const seq_data_t s1, const seq_data_t s2, char mode) {
 int main (int argc, char ** argv) {
 
 	/* usage */
-	if (argc != 3) {
-		fprintf(stderr, "usage: %s <file1> <file2>\n", argv[0]);
+	if (argc != 4) {
+		fprintf(stderr, "usage: %s <file1> <file2> <dist>\n", argv[0]);
 		exit(1);
 	}
 	char *file1 = argv[1];
 	char *file2 = argv[2];
+	int dist = atoi(argv[3]);
 	seq_data_t seqs1, seqs2;
 	
 	/* get sequences */
@@ -107,9 +116,9 @@ int main (int argc, char ** argv) {
 	printf("file2 (%s): %d\n", file2, seqs2.count);
 	
 	/* compare sequences */
-	compare_seqs(seqs1, seqs1, 'h');
-	compare_seqs(seqs2, seqs2, 'h');
-	compare_seqs(seqs1, seqs2, 'f');
+	compare_seqs(seqs1, seqs1, 'h', dist);
+	compare_seqs(seqs2, seqs2, 'h', dist);
+	compare_seqs(seqs1, seqs2, 'f', dist);
 	
 	exit(0);
 }
