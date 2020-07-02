@@ -86,7 +86,7 @@ def one_hotter(file, size):
 		array[i,:,:] = encoded
 	
 	return array
-	
+
 true = one_hotter(arg.true, arg.number)
 fake = one_hotter(arg.fake, arg.number)
 

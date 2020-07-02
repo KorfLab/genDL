@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import random
 import sys
 import gzip
 from math import floor
+import numpy as np
 
 parser = argparse.ArgumentParser(description=''.join(('Compute edit distance',
 	'between true and fake for acceptor/donor sequences')))
@@ -45,13 +47,47 @@ def edit_distance(seq1, seq2):
 		if seq1[i] != seq2[i]:
 			distance += 1
 	return distance
-	
-true = read_data(arg.true, 10000)
-fake = read_data(arg.fake, 10000)
 
-#ed = dict()
+#def ascii_histogram(data):
+#	
+	
+true = read_data(arg.true, -1)
+fake = read_data(arg.fake, -1)
+
 min = 50
 minpair = ('', '')
+
+n = 1000
+s = 100
+
+edhist = dict()
+edavgs = dict()
+for i in range(n):
+	edhist[i] = dict()
+	avgd = 0
+	ts = random.sample(range(len(true)),s)
+	fs = random.sample(range(len(fake)),s)
+	for t in ts:
+		for f in fs:
+			dis = edit_distance(true[t],fake[f])
+			avgd += dis
+			if dis in edhist[i]: edhist[i][dis] += 1
+			else: edhist[i][dis] = 1
+			if dis < min:
+				min = dis
+				minpair = (true[t], fake[f])
+				
+	edavgs[i] = avgd/s**2
+	print(edavgs[i])
+	for d, v in sorted(edhist[i].items(), key=lambda item: item[0]):
+		print(d, v)
+
+hist, bin_edges = np.histogram(np.array(list(edavgs.values())))
+print(hist)
+print(bin_edges)
+print(min)
+print(minpair)
+"""
 count = 0
 size = floor(len(true)*0.05)
 print(size)
@@ -72,3 +108,4 @@ for seqt in true:
 
 print()
 print(min, minpair)
+"""

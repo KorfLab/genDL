@@ -449,6 +449,7 @@ if __name__ == '__main__':
 
 	trues = get_seqs(arg.true, arg.n)
 	fakes = get_seqs(arg.fake, arg.n)
+	print(len(trues))
 	
 	acc0 = regex(trues, fakes, arg.x)
 	print(f'REGEX: {acc0:.4f}')
@@ -464,4 +465,3 @@ if __name__ == '__main__':
 	
 #	acc4 = kmer_threshold(trues, fakes, arg.x)
 #	print(f'KMER Threshold: {acc4:.4f}')
-
