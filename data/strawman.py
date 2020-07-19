@@ -451,8 +451,8 @@ if __name__ == '__main__':
 	fakes = get_seqs(arg.fake, arg.n)
 	print(len(trues))
 	
-	acc0 = regex(trues, fakes, arg.x)
-	print(f'REGEX: {acc0:.4f}')
+#	acc0 = regex(trues, fakes, arg.x)
+#	print(f'REGEX: {acc0:.4f}')
 	
 	acc1 = pwm_threshold(trues, fakes, arg.x)	
 	print(f'PWM Threshold: {acc1:.4f}')

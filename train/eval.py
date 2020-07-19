@@ -59,7 +59,7 @@ print(labels_train.shape, labels_val.shape)
 
 model = keras.Sequential([
 	keras.layers.Flatten(input_shape=(42,4)),
-#	keras.layers.Dense(200, activation='elu',
+	keras.layers.Dense(84, activation='elu'),
 #		kernel_regularizer=tf.keras.regularizers.l2(0.001)),
 #	keras.layers.Dropout(0.50),
 #	keras.layers.Dense(42, activation='elu',
@@ -83,7 +83,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6),
 	tf.keras.metrics.FalseNegatives(), tf.keras.metrics.TrueNegatives(),
 	tf.keras.metrics.FalsePositives()])
 	
-model.fit(seqs_train, labels_train, epochs=10, batch_size=100, 
+model.fit(seqs_train, labels_train, epochs=50, batch_size=500, 
 	validation_data=(seqs_val, labels_val))
 
 loss, acc, tp, fn, tn, fp = model.evaluate(seqs_val, labels_val, batch_size=1)
@@ -94,5 +94,7 @@ ppv = tp/(tp+fp)
 npv = tn/(tn+fn)
 print(f"{tpr:.4f} {tnr:.4f} {ppv:.4f} {npv:.4f}")
 print(f"{(tpr+ppv)/2:.4f}")
+
+model.summary()
 
 #tensorboard = TensorBoard(log_dir='logs/')
