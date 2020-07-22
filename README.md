@@ -23,52 +23,14 @@ site is any transcribed sequence that contains the canonical GT or AG signal
 but has not been seen in the RNASeq_splice data. Data comes from both
 positive and negative strands.
 
-| File            | Sequences |
-|:----------------|:----------|
-| acc.fake.txt    |  210674   |
-| acc.lo.true.txt |   10432   |
-| acc.hi.true.txt |    9196   |
-| don.fake.txt    |  194418   |
-| don.lo.true.txt |    9862   |
-| don.hi.true.txt |    9220   |
-
-## Data preparation ##
-
-To prepare the data for training deep neural networks, sequences first need
-to be one-hot encoded and shaped into proper numpy arrays. In `data` directory 
-is the `data_shaper.py` script that does the pre-processing. It is required to
-build a `one_hot/` directory to save the one-hot encoded data.
-
-*TO-DO*
-+ edit data_shaper.py to include unique identifiers for pickeled datasets.  
-
-## DL Model Training ##
-
-Currently using `eval.py` in `train/`. Construct your model there, and it will
-produce the accuracy from validation set. 
-*TO-DO*
-+ Allow for cross validation. 
-
-## Dataset subsetting ##
-
-`acceptors`
-| Level | Training | Validation |
-| :---- | :------- | :--------- |
-| hi    | 9000     | 196        |
-| lo    | 10000    | 432        |
-| fake  | 210000   | 674        |
-
-`donors`
-| Level | Training | Validation |
-| :---- | :------- | :--------- |
-| hi    | 9000     | 220        |
-| lo    | 9000     | 862        |
-| fake  | 194000   | 418        |
-
-Example, for hi vs fake training, train on all non-overlapping combinations
-of 9000 hi with 9000 fake. Each 9000x9000 training set is cross-validated. 
-Extra held out validation is used for post-validation. 
-9000 vs 210000 is 23 models to be cross validated. 
+| File                | Sequences |
+|:--------------------|:----------|
+| acc.fake.txt.gz     | 186671    |
+| acc.hi.true.txt.gz  | 8193      |
+| acc.lo.true.txt.gz  | 9148      |
+| don.fake.txt.gz     | 172559    |
+| don.hi.true.txt.gz  | 8215      |
+| don.lo.true.txt.gz  | 8708      |
 
 ## Learning tasks ##
 
@@ -88,33 +50,90 @@ Validation sets for each task.
 
 Total 8 learning tasks, the 4 listed for both acceptors and donors.
 
-## Position weight matrix strawman ##
+### Metrics ###
+We are using average of true positive rate and positive predictive value. 
 
-perform xv on a specific true/fake set
+## PWM Strawman ## 
 
+We learned a PWM from sequence data to classify the different sites and their 
+usage. `strawman.py` performs those experiments. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Results
+| acc/don | task         | n     | xv | PWM    | PWM vs PWM |
+|:------- |:------------ |:----- |:-- |:------ |:---------- |
+| acc     | hi-vs-fake   | 8000  | 10 | 0.9248 | 0.9408     |
+| acc     | lo-vs-fake   | 9000  | 10 | 0.7576 | 0.7293     |
+| acc     | hi-vs-lo     | 8000  | 10 | 0.8335 | 0.8348     |
+| acc     | hilo-vs-fake | 17000 | 10 | 0.7903 | 0.8000     |
+| don     | hi-vs-fake   | 8000  | 10 | 0.8717 | 0.9199     |
+| don     | lo-vs-fake   | 8000  | 10 | 0.7488 | 0.7421     |
+| don     | hi-vs-lo     | 8000  | 10 | 0.7892 | 0.7793     |
+| don     | hilo-vs-fake | 17000 | 10 | 0.7694 | 0.8150     |
 
 
+## Data preparation ##
 
+To prepare the data for training deep neural networks, sequences first need
+to be one-hot encoded and shaped into proper numpy arrays. In `data` directory 
+is the `data_shaper.py` script that does the pre-processing. It is required to
+build a `one_hot/` directory to save the one-hot encoded data.
 
+## DL Model Training ##
 
+Currently using `eval.py` in `train/`. Construct your model there, and it will
+produce the accuracy from validation set. 
+*TO-DO*
++ Allow for cross validation.
 
+## DL Architectures ##
+
+1. Feed forward neural network with flatten one-hot encoded inputs. 
+	+ Hyperparameters (network)
+		+ Number of layers
+		+ Number of units per layer
+		+ Regularization per layer
+		+ Dropout per layer
+		+ Activation functions
+	+ Hyperparameters (optimization)
+		+ Gradient optimizers
+		+ Learning rate
+		+ Learning rate schedule
+		+ Batch size
+		+ Epochs
+2. Convolutional Neural network with one-hot encoded matrix inputs
+	+ Hyperparameters (network)
+		+ Number of convolutional layers
+		+ Number of pooling layers
+		+ Filter sizes
+		+ Filter strides
+	+ Same optimization hyperparameters
+
+## Model Optimization ##
+
+Still in development. 
+Trying to make a class structure to produce model objects that can be iterated 
+over to test many hyperparameters. We also want to try and use the hparams
+module in tensorboard. 
+
+## Model Deployment ##
+
+Trained models are deployed across _C. elegans_ genome to find splice site
+donor and acceptor sites. Either deploy models on entirety of genome, and/or
+to specific gene regions of the genome. Applying models to regions with no
+genes may result in predictions of splice sites where there are none (be
+interesting to test). 
+
+The way deploymed models should be leveraged is using reciprocal predictions.
+A hi splice is called when it is predicted as hi label from hi vs fake model as
+well as hi vs lo model. Reciprocal prediction may not be the proper term, but
+the idea is that a label to be called (label meaning acc.hi don.hi etc) needs to
+be predicted from the two appropriate models. 
+
+Ideally, the advantage of this would be we could increase specificity. A hi acc
+site needs to be predicted from both hi-vs-fake and hi-vs-lo models. However,
+this approach could have disadvantages. One being loss of sensitivity. Another
+being a multiple comparisons problem. I am not sure what the statistical issues
+we introduce when doing two predictions. 
 
 
 
