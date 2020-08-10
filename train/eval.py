@@ -2,6 +2,18 @@
 
 import math
 
+def performance_metrics(model, vx, vy):
+	res = model.evaluate(vx, vy, batch_size=1)
+	
+	recall = res[-2]
+	precision = res[-1]
+	
+	f1 = 2*recall*precision/(recall+precision)
+	
+	print(f'f1: {f1:.4f} recall: {recall:.4f} precision: {precision:.4f}')
+	
+	return recall, preciTysion, f1
+	
 def summary_metrics(results):
 	table = ""
 	m = len(results.keys())

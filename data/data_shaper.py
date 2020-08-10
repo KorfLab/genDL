@@ -13,14 +13,12 @@ from tensorflow import keras
 
 parser = argparse.ArgumentParser(description=''.join(('Shape splice-site data',
 	' into one-hot encoding matrices')))
-parser.add_argument('--true', required=True, type=str,
-    metavar='<str>', help='true donor/acceptor data')
-parser.add_argument('--fake', required=True, type=str,
-	metavar='<str>', help='fake donor/acceptor data')
+parser.add_argument('--seqs', required=True, type=str,
+    metavar='<str>', help='donor/acceptor data')
 parser.add_argument('--type', required=True, type=str,
 	metavar='<str>', help='acceptor or donor examples')
 parser.add_argument('--level', required=True, type=str,
-	metavar='<str>', help='hi, lo, or hilo')
+	metavar='<str>', help='hi, lo, hilo, fake')
 parser.add_argument('--number', required=False, type=int, default=1000,
 	metavar='<int>', help='number of examples desired. -1 if you want all data')
 parser.add_argument('--window', required=False, type=int, default=42,
@@ -57,11 +55,11 @@ def seqs_list(filename, win):
 	
 	return seqs
 
-def pickling(type, bool, size, level, data):
+def pickling(type='acceptor', level='true', size='1000', data=[]):
 	if size == -1:
 		size = 'all'
-	time = datetime.datetime.now().strftime('%H:%M:%S')
-	filepath = f"{os.getcwd()}/one_hot/{type}.{bool}.{level}.{size}.{time}.pickle"
+	time = datetime.datetime.now().strftime('%H.%M.%S')
+	filepath = f"{os.getcwd()}/one_hot/{type}.{level}.{size}.{time}.pickle"
 	print(filepath)
 	pickle_out = open(filepath, "wb")
 	pickle.dump(data, pickle_out)
@@ -89,10 +87,9 @@ if __name__ == '__main__':
 	
 	assert(os.path.isdir('/'.join((os.getcwd(), 'one_hot'))))
 	assert(arg.type == 'acceptor' or arg.type == 'donor')
-	assert(arg.level == 'hi' or arg.level == 'lo' or arg.level == 'hilo')	
+	assert(arg.level == 'hi' or arg.level == 'lo' or arg.level == 'hilo' or 
+	arg.level == 'fake')	
 
-	true = one_hotter(arg.true, arg.number, arg.window)
-	fake = one_hotter(arg.fake, arg.number, arg.window)
+	data_set = one_hotter(arg.seqs, arg.number, arg.window)
 
-	pickling(arg.type, 'true', arg.number, arg.level, true)
-	pickling(arg.type, 'fake', arg.number, arg.level, fake)
+	pickling(type=arg.type,level=arg.level,size=arg.number,data=data_set)

@@ -9,7 +9,36 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 import numpy as np
 import tensorflow as tf
-import prep
+from tensorflow.keras import layers, optimizers, regularizers, losses, metrics
+from tensorflow.keras.callbacks import Callback
+from sklearn.metrics import f1_score, recall_score, precision_score
+
+class Metrics(Callback):
+	def __init__(self, validation):   
+		super(Metrics, self).__init__()
+		self.validation = validation    
+		
+		print('validation shape', len(self.validation[0]))
+		
+	def on_train_begin(self, logs={}):        
+		self.val_f1s = []
+		self.val_recalls = []
+		self.val_precisions = []
+	
+	def on_epoch_end(self, epoch, logs={}):
+		val_targ = self.validation[1]   
+		val_predict = (np.asarray(self.model.predict(self.validation[0]))).round()
+		
+		val_f1 = f1_score(val_targ, val_predict)
+		val_recall = recall_score(val_targ, val_predict)         
+		val_precision = precision_score(val_targ, val_predict)
+		
+		self.val_f1s.append(round(val_f1, 6))
+		self.val_recalls.append(round(val_recall, 6))
+		self.val_precisions.append(round(val_precision, 6))
+		
+		print(f' — val_ppv: {val_precision:.4f}, - val_tpr: {val_recall:.4f} — val_f1: {val_f1:.4f}')
+
 
 class FeedForwardModel():
 
@@ -33,37 +62,53 @@ class FeedForwardModel():
 				self.reg = kwargs['reg']
 			else:
 				self.reg = []
+			
+			if 'lr' in kwargs:
+				assert(type(kwargs['lr']) != str)
+				self.lr = kwargs['lr']
+			else:
+				self.lr = 1e-6
+		else:
+			self.lr = 1e-6
 		
 		self.model = self.build()
 		
 
 	def build(self):
 		model = tf.keras.Sequential()
-		model.add(tf.keras.layers.Flatten(input_shape=(42,4)))
+		model.add(layers.Flatten(input_shape=(42,4)))
 		
 		for i in range(self.layers):
 			if self.reg:
-				model.add(tf.keras.layers.Dense(
+				model.add(layers.Dense(
 					self.sizes[i],
 					activation='elu',
-					kernel_regularizer=tf.keras.regularizers.l2(self.reg[i]))
+					kernel_regularizer=regularizers.l2(self.reg[i]))
 				)
 			else:
-				model.add(tf.keras.layers.Dense(
+				model.add(layers.Dense(
 					self.sizes[i],
 					activation='elu')
 				)
 			
 			if self.dropout:
-				model.add(tf.keras.layers.Dropout(self.dropout[i]))	
+				model.add(layers.Dropout(self.dropout[i]))	
 					
-		model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
+		model.add(layers.Dense(1, activation='sigmoid'))
 		
-		return model
+		model.compile(optimizer=optimizers.Adam(learning_rate=self.lr),
+			loss=losses.BinaryCrossentropy(), metrics=['binary_accuracy', 
+			metrics.TruePositives(name='tp'), metrics.FalseNegatives(name='fn'), 
+			metrics.TrueNegatives(name='tn'), metrics.FalsePositives(name='fp'),
+			metrics.Recall(name='recall'), 
+			metrics.Precision(name='precision')])
+		
+		return model		
 
 if __name__ == '__main__':
 	
 	import prep
+	import eval
 	
 	parser = argparse.ArgumentParser(description=''.join(('Learning acceptor/',
 		'donor splice site labels')))
@@ -83,39 +128,13 @@ if __name__ == '__main__':
 	
 	model2 = FeedForwardModel(
 		layers=1,sizes=[84],reg=[0],dropout=[0]).build()
-
-	model1.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6),
-		loss=tf.keras.losses.BinaryCrossentropy(),
-		metrics=['binary_accuracy', tf.keras.metrics.TruePositives(),
-		tf.keras.metrics.FalseNegatives(), tf.keras.metrics.TrueNegatives(),
-		tf.keras.metrics.FalsePositives()])
 	
-	model1.fit(X, y, epochs=10, batch_size=100, 
-		validation_data=(vx, vy),verbose=2)
-
-	loss,acc,tp,fn,tn,fp = model1.evaluate(vx, vy, batch_size=1)
+	model1.fit(X, y, epochs=10, batch_size=100)
+#callbacks=[Metrics(validation=(vx,vy))])
 	
-	tpr = tp/(tp+fn)
-	tnr = tn/(tn+fp)
-	ppv = tp/(tp+fp)
-	npv = tn/(tn+fn)
-	print(f"{tpr:.4f} {tnr:.4f} {ppv:.4f} {npv:.4f}")
-	print(f"{(tpr+ppv)/2:.4f}")
+	r, p, f = eval.performance_metrics(model1, vx, vy)
 	
-	model2.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6),
-		loss=tf.keras.losses.BinaryCrossentropy(),
-		metrics=['binary_accuracy', tf.keras.metrics.TruePositives(),
-		tf.keras.metrics.FalseNegatives(), tf.keras.metrics.TrueNegatives(),
-		tf.keras.metrics.FalsePositives()])
+	model2.fit(X, y, epochs=10, batch_size=1000)
+#callbacks=[Metrics(validation=(vx,vy))])
 	
-	model2.fit(X, y, epochs=10, batch_size=100, 
-		validation_data=(vx, vy),verbose=2)
-
-	loss,acc,tp,fn,tn,fp = model2.evaluate(vx, vy, batch_size=1)
-
-	tpr = tp/(tp+fn)
-	tnr = tn/(tn+fp)
-	ppv = tp/(tp+fp)
-	npv = tn/(tn+fn)
-	print(f"{tpr:.4f} {tnr:.4f} {ppv:.4f} {npv:.4f}")
-	print(f"{(tpr+ppv)/2:.4f}")
+	r, p, f = eval.performance_metrics(model2, vx, vy)
