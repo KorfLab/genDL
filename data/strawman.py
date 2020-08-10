@@ -133,7 +133,7 @@ def regex(trues, fakex, xv):
 		PPV += ppv
 		NPV += npv
 
-	return (TPR+PPV)/(xv*2)
+	return (2*TPR*PPV)/(TPR+PPV)
 
 def make_pwm(seqs, boost=None):
 
@@ -313,12 +313,14 @@ def pwm_threshold(trues, fakes, xv):
 			if tp and stp:
 				tpr = tp / (tp + fn)
 				ppv = tp / (tp + fp)
-				acc = (tpr + ppv) / 2
+				acc = (2*tpr*ppv)/(tpr+ppv)
+#				acc = (tpr + ppv) / 2
 				if acc > acc_max:
 					acc_max = acc
 					ssn = stp / (stp + sfn)
 					ssp = stp / (stp + sfp)
-					self_max = (ssn + ssp) / 2
+					self_max = (2*ssn*ssp)/(ssn+ssp)
+#					self_max = (ssn + ssp) / 2
 
 		sys.stderr.write(f' train:{self_max} test:{acc_max}\n')
 		sum_acc += acc_max
@@ -328,7 +330,7 @@ def pwm_threshold(trues, fakes, xv):
 def pwm_vs_pwm(trues, fakes, xv):
 
 	sys.stderr.write('\npwm_vs_pwm\n')
-	TPR, TNR, PPV, NPV = 0, 0, 0, 0
+	TPR, TNR, PPV, NPV, FSC = 0, 0, 0, 0, 0
 	for x in range(xv):
 
 		# collect testing and training sets
@@ -369,13 +371,14 @@ def pwm_vs_pwm(trues, fakes, xv):
 		TNR += tnr
 		PPV += ppv
 		NPV += npv
+		FSC += (2*tpr*ppv)/(tpr+ppv)
 
-	return (TPR+PPV)/(xv*2)
+	return FSC/xv
 
 def boosted_pwms(trues, fakes, xv):
 
 	sys.stderr.write('\nboosted_pwms\n')
-	TPR, TNR, PPV, NPV = 0, 0, 0, 0
+	TPR, TNR, PPV, NPV, FSC = 0, 0, 0, 0, 0
 	for x in range(xv):
 
 		# collect testing and training sets
@@ -442,8 +445,9 @@ def boosted_pwms(trues, fakes, xv):
 		TNR += tnr
 		PPV += ppv
 		NPV += npv
+		FSC += (2*tpr*ppv)/(tpr+ppv)
 
-	return (TPR+PPV)/(xv*2)
+	return FSC/xv
 
 if __name__ == '__main__':
 

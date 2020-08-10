@@ -146,26 +146,27 @@ if __name__ == '__main__':
 		X, y, vx, vy = val_split(arg.true, arg.fake, arg.val)
 		
 		model = keras.Sequential([
- 			keras.layers.Flatten(input_shape=(42,4)),
- 			keras.layers.Dense(84, activation='elu'),
- 			keras.layers.Dense(1, activation='sigmoid')
- 		])
- 		
- 		model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6),
- 			loss=tf.keras.losses.BinaryCrossentropy(),
- 			metrics=['binary_accuracy', tf.keras.metrics.TruePositives(),
- 			tf.keras.metrics.FalseNegatives(), tf.keras.metrics.TrueNegatives(),
- 			tf.keras.metrics.FalsePositives()])
- 		
- 		model.fit(X, y, epochs=50, batch_size=10, 
- 			validation_data=(vx, vy))
- 		
- 		loss, acc, tp, fn, tn, fp = model.evaluate(vx, vy, batch_size=1)
- 		
- 		tpr += tp/(tp+fn)
- 		tnr += tn/(tn+fp)
- 		ppv += tp/(tp+fp)
- 		npv += tn/(tn+fn)
- 		
- 		print(f"{tpr/arg.xv:.4f} {tnr/arg.xv:.4f} {ppv/arg.xv:.4f} {npv/arg.xv:.4f}")
- 		print(f"{(tpr+ppv)/(2*arg.xv):.4f}")
+			keras.layers.Flatten(input_shape=(42,4)),
+			keras.layers.Dense(84, activation='elu'),
+			keras.layers.Dense(1, activation='sigmoid')
+		])
+		
+		model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6),
+			loss=tf.keras.losses.BinaryCrossentropy(),
+			metrics=['binary_accuracy', tf.keras.metrics.TruePositives(),
+			tf.keras.metrics.FalseNegatives(), tf.keras.metrics.TrueNegatives(),
+			tf.keras.metrics.FalsePositives()]
+		)
+		
+		model.fit(X, y, epochs=50, batch_size=10, 
+			validation_data=(vx, vy))
+		
+		loss, acc, tp, fn, tn, fp = model.evaluate(vx, vy, batch_size=1)
+		
+		tpr += tp/(tp+fn)
+		tnr += tn/(tn+fp)
+		ppv += tp/(tp+fp)
+		npv += tn/(tn+fn)
+		
+		print(f"{tpr/arg.xv:.4f} {tnr/arg.xv:.4f} {ppv/arg.xv:.4f} {npv/arg.xv:.4f}")
+		print(f"{(tpr+ppv)/(2*arg.xv):.4f}")

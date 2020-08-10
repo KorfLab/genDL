@@ -31,7 +31,7 @@ parser.add_argument('--xv', required=False, type=int,
 
 arg = parser.parse_args()
 
-def listprod(list=[],level=0,sublist=[]):
+def listprod(list=[],level=0,sublist=[],funnel=True):
 	"""
 	Inputs:
 	
@@ -44,18 +44,20 @@ def listprod(list=[],level=0,sublist=[]):
 			
 	if level+1 == len(list):
 		for k in list[level]:
-			if len(sublist) != 0:
-				if k >= sublist[level-1]: continue
+			if funnel:
+				if len(sublist) != 0:
+					if k >= sublist[level-1]: continue
 			sublist.append(k)
 			yield sublist
 			sublist.pop()
 		return
 	elif level+1 < len(list):
 		for k in list[level]:
-			if len(sublist) != 0:
-				if k >= sublist[level-1]: continue
+			if funnel:
+				if len(sublist) != 0:
+					if k >= sublist[level-1]: continue
 			sublist.append(k)
-			for l in listprod(list=list,level=level+1,sublist=sublist):
+			for l in listprod(list=list,level=level+1,sublist=sublist,funnel=funnel):
 				yield(l)
 			sublist.pop()
 
@@ -76,7 +78,7 @@ t0 = time.perf_counter()
 for l in layers:
 	print('layers ',l)
 	
-	for s in listprod(list=layers_list[:l],level=0,sublist=[]):
+	for s in listprod(list=layers_list[:l],level=0,sublist=[],funnel=True):
 		print('\t',s)
 		counter += 1
 		model = FeedForwardModel(
@@ -87,10 +89,6 @@ for l in layers:
 			metrics=['binary_accuracy', tf.keras.metrics.TruePositives(),
 			tf.keras.metrics.FalseNegatives(), tf.keras.metrics.TrueNegatives(),
 			tf.keras.metrics.FalsePositives()])
-		
-		#model_pre = Pretraining(model)
-		#fit model_pre, then grab weights from encoder half to initialize
-		
 		
 		model.fit(X, y, epochs=10, batch_size=500, 
 			validation_data=(xv, yv),verbose=2)
