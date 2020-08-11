@@ -24,6 +24,7 @@ CREATE TABLE data (
 	type TEXT,
 	level TEXT,
 	number INTEGER,
-	name TEXT,
+	true_name TEXT,
+	fake_name TEXT,
 	FOREIGN KEY ([model_id]) REFERENCES "models" ([model_id]) ON DELETE ACTION ON UPDATE NO ACTION
 );
