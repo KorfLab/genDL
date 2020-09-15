@@ -265,32 +265,30 @@ def generating_consensus_sequence(number_of_clusters, data_labeled_sequences):
 
 
 def position_weight_matrix(pfm): #ppm
-    stuff = {}
+    storage = {}
     for label, frequency in pfm.items():
 
-        pfm = []
+        pwm = []
         for i in range(len(frequency)):
-            pfm.append([])
+            pwm.append([])
 
-        for pfm_list in range(len(frequency)):
-            total_number_of_bases = sum(frequency[pfm_list])
-            #print(total_number_of_bases, frequency[pfm_list])
+        for pwm_list in range(len(frequency)):
+            total_number_of_bases = sum(frequency[pwm_list])
+            #print(total_number_of_bases, frequency[pwm_list])
 
-            for pfm_value in frequency[pfm_list]:
+            for pwm_value in frequency[pwm_list]:
                 #print(pfm_value)
                 try:
-                    calculation = (pfm_value/total_number_of_bases)/0.25
+                    calculation = (pwm_value/total_number_of_bases)/0.25
                     caclulated_value = round((math.log(calculation, 2.0)),5)
                     #print(caclulated_value)
-                    pfm[pfm_list].append(caclulated_value)
+                    pwm[pwm_list].append(caclulated_value)
 
                 except ValueError:
-                    pfm[pfm_list].append((-math.inf))
-        stuff[label] = pfm
+                    pwm[pwm_list].append((math.inf))
+        storage[label] = pwm
 
-    print(stuff)
-
-    return
+    return print(storage)
 
 
 def graph():
