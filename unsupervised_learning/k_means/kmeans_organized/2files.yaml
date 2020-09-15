@@ -1,0 +1,22 @@
+../../phylogenetic_tree/acc.hi.true:
+- TCAGG
+- TCAGG
+- TCAGC
+- TCAGG
+- AAAGT
+- TTAGA
+- TCAGT
+- CCAGT
+- TCAGA
+- TCAGT
+../../phylogenetic_tree/acc.lo.true:
+- AGAGC
+- GCAGT
+- CCAGC
+- TCAGC
+- CGAGG
+- GCAGA
+- ATTCG
+- ATAGT
+- GGAGG
+- AAAGC
