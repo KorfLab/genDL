@@ -432,5 +432,16 @@ def boosted_pwms(trues, fakes, xv):
 	return FSC/xv
 
 def kmeans_pwm(trues, fakes, xv):
+
+	for x in xv:
+		for k in range(2, 7):
+			# do the clustering
+			# create k PWMs from k clusters
+				# find optimal threshold for each PWM
+				# score
+			# aggregate scores for these PWMs
+		# aggregate scores for this k
+	# report highest performance
+
 	return 1.000
 
