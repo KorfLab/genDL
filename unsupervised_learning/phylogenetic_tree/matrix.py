@@ -37,9 +37,12 @@ sequences= []
 if arg.multiple == 'n':
     with open((arg.file),"r") as file:
         line = file.read().splitlines()
+        print(line)
+        random.shuffle(line)
+        print(line)
+    #print(line)
         for i in range(arg.num):
-            choosing_seqs = random.choice(line)
-            sequences.append(choosing_seqs[arg.min:arg.max])
+            sequences.append(line[i][arg.min:arg.max])
 elif arg.multiple == 'y':
     for line in fileinput.input(arg.file):
         line = line.rstrip() # remove newline (return character), often useful
@@ -62,6 +65,7 @@ for s1 in range(len(sequences)):
         else:
             dist = edit(sequences[s1], sequences[sn])
             table[sn].append(dist)
+
 #print(table)
 ##notes:
 ##mention the number of sequences and the shuffle at least one (there is a relation between)
@@ -96,8 +100,30 @@ for i in range(len(table)):
     my_file.write('\t'.join(row) + '\n')
 my_file.write(';' + '\n')
 my_file.write('END;' + '\n')
-#my_file.write('DIMENSIONS NChar=' + str((len(sequences)+1)*(len(sequences))) + ';' + '\n')
+
+
+file_name = str(arg.name)+'.nex'
+file_name1 = str(arg.name)+'.svg'
+
+#os.system('xvfb-run --auto-servernum --server-num=1 SplitsTree -g')
+
+#ipc - interprocess communication
+
 '''
+
+command file, input file
+
+command file
+begin Splitstree
+LOAD FILE=/Users/Amalia/Tutorials1/NNE/genDL/unsupervised_learning/phylogenetic_tree/my_file
+UPDATE
+EXPORTGRAPHICS format=SVG TEXTASSHAPES=YES file=/Users/Amalia/Tutorials1/NNE/genDL/unsupervised_learning/phylogenetic_tree/file_name1
+QUIT
+end;
+
+global tree?
+donor vs accepto
+
 my_file.write(';' + '\n')
 my_file.write('END;' + '\n')
 

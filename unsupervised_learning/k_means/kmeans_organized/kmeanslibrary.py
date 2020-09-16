@@ -290,6 +290,18 @@ def position_weight_matrix(pfm): #ppm
 
     return print(storage)
 
+def position_probability_matrix(pfm):
+    storage = {}
+
+
+    for label, frequency in pfm.items():
+
+        ppm = []
+        for i in range(len(frequency)):
+            ppm.append([])
+
+        for ppm_list in range(len(frequency)):
+            total_number_of_bases = sum(frequency[ppm_list])
 
 def graph():
     #using heat_map

@@ -1,0 +1,12 @@
+#kmeans only
+#argparse
+
+#1
+#file
+#how many clusters
+#output = cluster by categories
+#encoding of the letters
+#kmeans
+#format of the output
+
+#2
