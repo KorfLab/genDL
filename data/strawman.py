@@ -11,9 +11,9 @@ parser.add_argument('--true', required=True, type=str,
 parser.add_argument('--fake', required=True, type=str,
 	metavar='<path>', help='.gz file of fake sequences')
 parser.add_argument('--nt', required=False, type=int, default=1000,
-	metavar='<int>', help='maximum number of true sequences to use [%(default)i]')
+	metavar='<int>', help='number of true sequences to use [%(default)i]')
 parser.add_argument('--nf', required=False, type=int, default=1000,
-	metavar='<int>', help='maximum number of fake sequences to use [%(default)i]')
+	metavar='<int>', help='number of fake sequences to use [%(default)i]')
 parser.add_argument('--x', required=False, type=int, default=2,
 	metavar='<int>', help='cross-validation level [%(default)i]')
 parser.add_argument('--k', required = False, type = int, default = 2,
