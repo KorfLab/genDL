@@ -3,13 +3,18 @@ import gzip
 import math
 import re
 import sys
+import random
+import pandas as pd
+from sklearn.cluster import KMeans
 
 def get_seqs(file, limit):
 	seqs = []
 	with gzip.open(file, mode='rt') as fp:
-		for line in fp.readlines():
-			seqs.append(line.rstrip())
-			if len(seqs) == limit: break
+		lines = fp.read().splitlines()
+		random.shuffle(lines)
+		for i in range(limit):
+			seqs.append(lines[i])
+
 	return seqs
 
 def dkl(p, q):
@@ -20,7 +25,7 @@ def dkl(p, q):
 	return d
 
 def make_regex(trues):
-	
+
 	sim = {
 		'A': {'A':0.97, 'C':0.01, 'G':0.01, 'T':0.01},
 		'C': {'A':0.01, 'C':0.97, 'G':0.01, 'T':0.01},
@@ -38,7 +43,7 @@ def make_regex(trues):
 		'V': {'A':0.33, 'C':0.33, 'G':0.33, 'T':0.01},
 		'N': {'A':0.25, 'C':0.25, 'G':0.25, 'T':0.25},
 	}
-	
+
 	reg = {
 		'A': 'A',
 		'C': 'C',
@@ -56,7 +61,7 @@ def make_regex(trues):
 		'V': '[ACG]',
 		'N': '.',
 	}
-	
+
 	# build regex from pwm
 	pwm = make_pwm(trues)
 	ntstr = ''
@@ -71,7 +76,7 @@ def make_regex(trues):
 				min_nt = nt
 		ntstr += min_nt
 		restr += reg[min_nt]
-	
+
 	return restr, ntstr
 
 def regex(trues, fakes, xv):
@@ -91,7 +96,7 @@ def regex(trues, fakes, xv):
 
 		# make regex
 		restr, ntstr = make_regex(ttrain)
-		
+
 		# score against test set
 		tp, tn, fp, fn = 0, 0, 0, 0
 		for seq in ttest:
@@ -120,8 +125,9 @@ def regex(trues, fakes, xv):
 	return (2*TPR*PPV)/(TPR+PPV)
 
 def make_pwm(seqs, boost=None):
-
+	#print(seqs)
 	length = len(seqs[0])
+	#print(length)
 
 	# create counts
 	count = []
@@ -141,9 +147,9 @@ def make_pwm(seqs, boost=None):
 	for i in range(length): freq.append({})
 	for i in range(length):
 		for c in count[i]:
-			freq[i][c] = count[i][c] / total
+			freq[i][c] = round((count[i][c] / total),3) ####
 
-	return freq
+	return (freq)
 
 def make_kmer(seqs, k, boost=None):
 	length = len(seqs[0])
@@ -155,9 +161,9 @@ def make_kmer(seqs, k, boost=None):
 			if kmer not in count: count[kmer] = 1
 			else:                 count[kmer] += 1
 			total += 1
-	
+
 	if len(count) != 4 ** k: return None # some zero counts found
-	
+
 	freq = {}
 	for kmer in count: freq[kmer] = count[kmer] / total
 	return freq
@@ -186,28 +192,28 @@ def kmer_threshold(trues, fakes, xv):
 	while kmers_full:
 		k += 1
 		sum_acc = 0
-		
+
 		for x in range(xv):
-		
+
 			# collect testing and training sets
 			train, test = [], []
 			for i in range(len(trues)):
 				if i % xv == x: test.append(trues[i])
 				else:           train.append(trues[i])
-	
+
 			# build mm
 			km = make_kmer(train, k)
 			if km == None:
 				kmers_full = False
 				break
-				
+
 			# find maximum thresholds
 			vmax = 0
 			for kmer in km:
 				if km[kmer] > vmax: vmax = km[kmer]
 			tmax = vmax ** length
 			tmin = (0.25 ** (k)) ** length
-			
+
 			# find max t by stepping down tmax by half each time
 			sys.stderr.write(f'set-{x} k-{k}')
 			t = tmax
@@ -216,7 +222,7 @@ def kmer_threshold(trues, fakes, xv):
 			while True:
 				t /= 2
 				if t < tmin: break # no sense going below tmin
-			
+
 				# score against test set
 				tp, tn, fp, fn = 0, 0, 0, 0
 				for seq in test:
@@ -228,7 +234,7 @@ def kmer_threshold(trues, fakes, xv):
 					s = score_kmer(seq, km, k)
 					if s > t: fp += 1
 					else:     tn += 1
-	
+
 				if tp:
 					tpr = tp / (tp + fn)
 					ppv = tp / (tp + fp)
@@ -239,7 +245,7 @@ def kmer_threshold(trues, fakes, xv):
 			if sum_acc > max_k_acc:
 				max_k_acc = sum_acc
 				max_k = k
-	
+
 	return max_k_acc/xv
 
 def pwm_evaluate(pwm, t, tsites, fsites):
@@ -248,17 +254,19 @@ def pwm_evaluate(pwm, t, tsites, fsites):
 		s = score_pwm(seq, pwm)
 		if s > t: tp += 1
 		else:     fn += 1
-	for i in range(len(tsites)): # fakes could be bigger, so limit
-		seq = fsites[i]
+
+	for seq in fsites: # fakes could be bigger, so limit
 		s = score_pwm(seq, pwm)
 		if s > t: fp += 1
 		else:     tn += 1
+	#print('range',len(fsites),i)
 	return tp, tn, fp, fn
 
 def pwm_threshold(trues, fakes, xv):
 
 	sys.stderr.write('\npwm_threshold\n')
 	sum_acc = 0
+	sum_acc_fake = 0
 	for x in range(xv):
 
 		# collect testing and training sets
@@ -266,10 +274,11 @@ def pwm_threshold(trues, fakes, xv):
 		for i in range(len(trues)):
 			if i % xv == x: test.append(trues[i])
 			else:           train.append(trues[i])
-	
+		#print(train, test)
+
 		# build pwm
 		pwm = make_pwm(train)
-	
+
 		# find maximum threshold
 		tmax = 1
 		for i in range(len(pwm)):
@@ -278,7 +287,7 @@ def pwm_threshold(trues, fakes, xv):
 				if pwm[i][c] > max: max = pwm[i][c]
 			tmax *= max
 		tmin = 0.25 ** len(pwm)
-		
+
 		# find max t by stepping down tmax by half each time
 		sys.stderr.write(f'set-{x} ')
 		t = tmax
@@ -288,31 +297,43 @@ def pwm_threshold(trues, fakes, xv):
 		while True:
 			t /= 2
 			if t < tmin: break # no sense going below tmin
-			
-			# score against training set (check overtraining)
+
 			stp, stn, sfp, sfn = pwm_evaluate(pwm, t, train, fakes)
-			
+
 			# score against test set
 			tp, tn, fp, fn = pwm_evaluate(pwm, t, test, fakes)
 			if tp and stp:
-				tpr = tp / (tp + fn)
-				ppv = tp / (tp + fp)
-				acc = (2*tpr*ppv)/(tpr+ppv)
+				#tpr = (tp + tn) / (tp + fn + tn)
+				#ppv = tp / (tp + fp)
+				#acc = (1.25*tpr*ppv)/(tpr+ppv*0.25)
+				acc = (tp + tn)/(tp+tn+fp+fn)
+
+				#acc = tp/(tp+fn)
+				#acc_fake = tn/(fp+tn)
+
+				#acc_fake = tn/(fp+tn)
 				if acc > acc_max:
 					acc_max = acc
-					ssn = stp / (stp + sfn)
-					ssp = stp / (stp + sfp)
-					self_max = (2*ssn*ssp)/(ssn+ssp)
+					#ssn = stp / (stp + sfn)
+					#ssp = stp / (stp + sfp)
+					#self_max = (1.25*ssn*ssp)/(ssn+ssp*0.25)
 
+					self_max = (stp+stn)/(stp+stn+sfp+sfn)
+
+					#self_max = (stp)/(stp+sfn)
+					#self_max_fake = (sfn)/(sfp+stn) ###
 		sys.stderr.write(f' train:{self_max} test:{acc_max} t:{t}\n')
 		sum_acc += acc_max
-		
-	return sum_acc / xv
+		#sum_acc_fake += acc_fake
+	#print(f'Fakes: {sum_acc_fake/xv:.4f}')
+
+	return (sum_acc / xv)
 
 def pwm_vs_pwm(trues, fakes, xv):
 
 	sys.stderr.write('\npwm_vs_pwm\n')
-	TPR, TNR, PPV, NPV, FSC = 0, 0, 0, 0, 0
+	#TPR, TNR, PPV, NPV, FSC = 0, 0, 0, 0, 0
+	ACC = 0
 	for x in range(xv):
 
 		# collect testing and training sets
@@ -327,7 +348,7 @@ def pwm_vs_pwm(trues, fakes, xv):
 		# make pwms
 		tpwm = make_pwm(ttrain)
 		fpwm = make_pwm(ftrain)
-		
+
 		# score against test set
 		tp, tn, fp, fn = 0, 0, 0, 0
 		for seq in ttest:
@@ -343,19 +364,21 @@ def pwm_vs_pwm(trues, fakes, xv):
 			else:       tn += 1
 
 		# gather performance stats
-		tpr = tp / (tp + fn)
-		tnr = tn / (tn + fp)
-		ppv = tp / (tp + fp)
-		npv = tn / (tn + fn)
+		#tpr = tp / (tp + fn)
+		#tnr = tn / (tn + fp)
+		#ppv = tp / (tp + fp)
+		#npv = tn / (tn + fn)
 
-		sys.stderr.write(f'set-{x} {tpr:.3f} {tnr:.3f} {ppv:.3f} {npv:.3f}\n')
-		TPR += tpr
-		TNR += tnr
-		PPV += ppv
-		NPV += npv
-		FSC += (2*tpr*ppv)/(tpr+ppv)
+		#sys.stderr.write(f'set-{x} {tpr:.3f} {tnr:.3f} {ppv:.3f} {npv:.3f}\n')
+		#TPR += tpr
+		#TNR += tnr
+		#PPV += ppv
+		#NPV += npv
+		#FSC += (2*tpr*ppv)/(tpr+ppv)
+		acc = (tp + tn)/(tp+tn+fp+fn)
+		ACC += acc
 
-	return FSC/xv
+	return ACC/xv
 
 def boosted_pwms(trues, fakes, xv):
 
@@ -375,7 +398,7 @@ def boosted_pwms(trues, fakes, xv):
 		# make pwms without boosting
 		tpwm = make_pwm(ttrain)
 		fpwm = make_pwm(ftrain)
-		
+
 		# score against test set and set boost
 		tboost = []
 		fboost = []
@@ -398,11 +421,11 @@ def boosted_pwms(trues, fakes, xv):
 			else:
 				tn += 1
 				fboost.append(1)
-				
+
 		# re-make pwms with boosting
 		tpwm = make_pwm(ttrain, boost=tboost)
 		fpwm = make_pwm(ftrain, boost=fboost)
-		
+
 		# evaluate boosted PWMs
 		tp, tn, fp, fn = 0, 0, 0, 0
 		for seq in ttest:
@@ -415,7 +438,7 @@ def boosted_pwms(trues, fakes, xv):
 			fs = score_pwm(seq, fpwm)
 			if ts > fs: fp += 1
 			else:       tn += 1
-		
+
 		# gather performance stats
 		tpr = tp / (tp + fn)
 		tnr = tn / (tn + fp)
@@ -431,10 +454,111 @@ def boosted_pwms(trues, fakes, xv):
 
 	return FSC/xv
 
-def kmeans_pwm(trues, fakes, xv):
+def kmeans_pwm(trues, fakes, k, xv):
+	#print(trues)
+	#print(fakes)
+	sys.stderr.write('\npkmeans_pwm\n')
 
-	for x in xv:
-		for k in range(2, 7):
+	for x in range(xv):
+		print(x)
+
+		one_dim_table = trues + fakes
+		#print(one_dim_table)
+		assert(k <= len(one_dim_table))
+
+		#print(len(one_dim_table))
+
+		list_bases = {'A': 1.0, 'C': 2.0, 'G': 3.0, 'T': 4.0}
+
+		converted_sequences = []
+
+		for i in range(len(one_dim_table)):
+			converted_sequences.append([])
+
+		for item in range(len(one_dim_table)):
+			for i in one_dim_table[item]:
+				if i in list_bases.keys():
+					converted_sequences[item].append(list_bases[i])
+
+		df = pd.DataFrame(converted_sequences)
+
+		headers = []
+		for i in range(len(converted_sequences[0])):
+			headers.append(str(f'p{i}'))
+		df.columns = headers
+
+
+
+		for num in range(2, k+1):
+			kmeans = KMeans(num).fit(df)
+			centroids = kmeans.cluster_centers_
+			#print('Number of clusters:', num, '\n',
+				  #'Labels:', kmeans.labels_)
+				  #'Centroids:','\n', centroids)
+
+			###TRUES
+			true_seq_splitted_by_labels = {}
+
+			labels_true = kmeans.labels_[:len(trues)]
+
+			for label, sequence in zip(labels_true, trues):
+				#print(label, sequence)
+				if label in true_seq_splitted_by_labels:
+					true_seq_splitted_by_labels[label].append(sequence)
+				else:
+					true_seq_splitted_by_labels[label] = []
+					true_seq_splitted_by_labels[label].append(sequence)
+			#print('Complete true:', true_seq_splitted_by_labels)
+
+
+			###FAKES
+			fake_seq_splitted_by_labels = {}
+
+			labels_fake = kmeans.labels_[len(trues):]
+
+			for label, sequence in zip(labels_fake, fakes):
+				if label in fake_seq_splitted_by_labels:
+					fake_seq_splitted_by_labels[label].append(sequence)
+				else:
+					fake_seq_splitted_by_labels[label] = []
+					fake_seq_splitted_by_labels[label].append(sequence)
+			#print('Complete fake', fake_seq_splitted_by_labels)
+
+			#pwm
+
+			for true_label, true_list_of_seq in true_seq_splitted_by_labels.items():
+
+				(make_pwm(true_list_of_seq)) ###checking how pwm looks like
+
+				for fake_label, fake_list_of_seq in fake_seq_splitted_by_labels.items():
+					if true_label == fake_label: ###change later, because going over the same labels more than once
+						#print(true_list_of_seq)
+						print('Label_true:', true_label)
+						print('Label_fake:', fake_label)
+						print(len(true_list_of_seq), len(fake_list_of_seq))
+						print('pwp')
+						print(pwm_threshold(true_list_of_seq, fake_list_of_seq, xv))
+
+				#print(true_label, fake_label)
+				#print(true_list_of_seq, fake_list_of_seq)
+						#print(pwm_threshold(true_list_of_seq, fake_list_of_seq, xv))
+
+			#threshhold for where we use fakes and trues of appropriate label
+			#split fakes and trues based on the labels, and then pass them to thre threshold
+
+
+
+
+		#sys.exit()
+
+
+
+
+
+
+
+
+
 			# do the clustering
 			# create k PWMs from k clusters
 				# find optimal threshold for each PWM
@@ -443,5 +567,5 @@ def kmeans_pwm(trues, fakes, xv):
 		# aggregate scores for this k
 	# report highest performance
 
-	return 1.000
+	return
 
