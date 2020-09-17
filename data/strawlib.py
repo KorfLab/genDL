@@ -125,9 +125,7 @@ def regex(trues, fakes, xv):
 	return (2*TPR*PPV)/(TPR+PPV)
 
 def make_pwm(seqs, boost=None):
-	#print(seqs)
 	length = len(seqs[0])
-	#print(length)
 
 	# create counts
 	count = []
@@ -147,9 +145,9 @@ def make_pwm(seqs, boost=None):
 	for i in range(length): freq.append({})
 	for i in range(length):
 		for c in count[i]:
-			freq[i][c] = round((count[i][c] / total),3) ####
+			freq[i][c] = count[i][c] / total
 
-	return (freq)
+	return freq
 
 def make_kmer(seqs, k, boost=None):
 	length = len(seqs[0])
@@ -250,16 +248,17 @@ def kmer_threshold(trues, fakes, xv):
 
 def pwm_evaluate(pwm, t, tsites, fsites):
 	tp, tn, fp, fn = 0, 0, 0, 0
+	
 	for seq in tsites:
 		s = score_pwm(seq, pwm)
 		if s > t: tp += 1
 		else:     fn += 1
 
-	for seq in fsites: # fakes could be bigger, so limit
+	for seq in fsites:
 		s = score_pwm(seq, pwm)
 		if s > t: fp += 1
 		else:     tn += 1
-	#print('range',len(fsites),i)
+	
 	return tp, tn, fp, fn
 
 def pwm_threshold(trues, fakes, xv):
@@ -274,12 +273,11 @@ def pwm_threshold(trues, fakes, xv):
 		for i in range(len(trues)):
 			if i % xv == x: test.append(trues[i])
 			else:           train.append(trues[i])
-		#print(train, test)
 
 		# build pwm
 		pwm = make_pwm(train)
 
-		# find maximum threshold
+		# find maximum and minimum thresholds
 		tmax = 1
 		for i in range(len(pwm)):
 			max = 0
@@ -384,6 +382,7 @@ def boosted_pwms(trues, fakes, xv):
 
 	sys.stderr.write('\nboosted_pwms\n')
 	TPR, TNR, PPV, NPV, FSC = 0, 0, 0, 0, 0
+	ACC = 0
 	for x in range(xv):
 
 		# collect testing and training sets
@@ -440,19 +439,21 @@ def boosted_pwms(trues, fakes, xv):
 			else:       tn += 1
 
 		# gather performance stats
-		tpr = tp / (tp + fn)
-		tnr = tn / (tn + fp)
-		ppv = tp / (tp + fp)
-		npv = tn / (tn + fn)
+		acc = (tp + tn) / (tp + tn + fp + fn)
+#		tpr = tp / (tp + fn)
+#		tnr = tn / (tn + fp)
+#		ppv = tp / (tp + fp)
+#		npv = tn / (tn + fn)
 
-		sys.stderr.write(f'set-{x} {tpr:.3f} {tnr:.3f} {ppv:.3f} {npv:.3f}\n')
-		TPR += tpr
-		TNR += tnr
-		PPV += ppv
-		NPV += npv
-		FSC += (2*tpr*ppv)/(tpr+ppv)
+#		sys.stderr.write(f'set-{x} {tpr:.3f} {tnr:.3f} {ppv:.3f} {npv:.3f}\n')
+#		TPR += tpr
+#		TNR += tnr
+#		PPV += ppv
+#		NPV += npv
+#		FSC += (2*tpr*ppv)/(tpr+ppv)
+		ACC += acc
 
-	return FSC/xv
+	return acc / xv
 
 def kmeans_pwm(trues, fakes, k, xv):
 	#print(trues)
