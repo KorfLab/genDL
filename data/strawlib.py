@@ -12,6 +12,9 @@ def get_seqs(file, limit):
 	seqs = []
 	with gzip.open(file, mode='rt') as fp:
 		lines = fp.read().splitlines()
+		if limit > len(lines):
+			sys.stderr.write(f'limit {limit} exceeds sequences {len(lines)}\n')
+			sys.exit(1)
 		random.shuffle(lines)
 		for i in range(limit):
 			seqs.append(lines[i])
