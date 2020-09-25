@@ -8,16 +8,15 @@ import pandas as pd
 from sklearn.cluster import KMeans
 import pprint
 
-def get_seqs(file, limit):
+def get_seqs(file, limit, start, end):
 	seqs = []
 	with gzip.open(file, mode='rt') as fp:
 		lines = fp.read().splitlines()
 		if limit > len(lines):
 			sys.stderr.write(f'limit {limit} exceeds sequences {len(lines)}\n')
-			sys.exit(1)
 		random.shuffle(lines)
 		for i in range(limit):
-			seqs.append(lines[i])
+			seqs.append(lines[i][start:end])
 
 	return seqs
 
@@ -267,7 +266,7 @@ def pwm_evaluate(pwm, t, tsites, fsites):
 
 def pwm_threshold(trues, fakes, xv):
 
-	sys.stderr.write('\npwm_threshold\n')
+	#sys.stderr.write('\npwm_threshold\n')
 	sum_acc = 0
 	sum_acc_fake = 0
 	for x in range(xv):
@@ -291,7 +290,7 @@ def pwm_threshold(trues, fakes, xv):
 		tmin = 0.25 ** len(pwm)
 
 		# find max t by stepping down tmax by half each time
-		sys.stderr.write(f'set-{x} ')
+		#sys.stderr.write(f'set-{x} ')
 		t = tmax
 		n = 0
 		acc_max = 0
@@ -324,13 +323,14 @@ def pwm_threshold(trues, fakes, xv):
 
 					#self_max = (stp)/(stp+sfn)
 					#self_max_fake = (sfn)/(sfp+stn) ###
-		sys.stderr.write(f' train:{self_max} test:{acc_max} t:{t}\n')
+		#sys.stderr.write(f' train:{self_max} test:{acc_max} t:{t}\n')
 		sum_acc += acc_max
 
-		return t ###how to do this
+		#return t ###how to do this
 		#sum_acc_fake += acc_fake
 	#print(f'Fakes: {sum_acc_fake/xv:.4f}')
 
+	return t
 	#return (sum_acc / xv)
 
 def pwm_vs_pwm(trues, fakes, xv):
@@ -461,213 +461,131 @@ def boosted_pwms(trues, fakes, xv):
 
 	return acc / xv
 
+def kmeans(seqs, k, xv, x):
+	train, test = [], []
+	for i in range(len(seqs)):
+		if i % xv == x:
+			test.append(seqs[i])
+		else:
+			train.append(seqs[i])
+
+	assert(k<=len(train))
+
+	list_bases = {'A': 1.0, 'C': 2.0, 'G': 3.0, 'T': 4.0}
+
+	converted_sequences = []
+
+	for i in range(len(train)):
+		converted_sequences.append([])
+
+	for item in range(len(train)):
+		for i in train[item]:
+			if i in list_bases.keys():
+				converted_sequences[item].append(list_bases[i])
+
+	df = pd.DataFrame(converted_sequences)
+
+	headers = []
+	for i in range(len(converted_sequences[0])):
+		headers.append(str(f'p{i}'))
+	df.columns = headers
+
+	kmeans = KMeans(k).fit(df)
+	centroids = kmeans.cluster_centers_
+
+	seqs_by_label = {}
+	for label, seq in zip(kmeans.labels_, train):
+		if label in seqs_by_label:
+			seqs_by_label[label].append(seq)
+		else:
+			seqs_by_label[label] = []
+			seqs_by_label[label].append(seq)
+	'''
+	storing_thr = {}
+	for thr_label, thr_seqs in seqs_by_label.items():
+		trues_thr = thr_seqs
+		fakes_thr = []
+
+
+
+		temp_seqs_by_label = seqs_by_label
+		for temp_label, temp_seqs in temp_seqs_by_label.items():
+			if temp_label == thr_label:
+				pass
+			else:
+				fakes_thr = fakes_thr + temp_seqs_by_label[temp_label]
+		storing_thr[thr_label] = pwm_threshold(trues_thr, fakes_thr, xv)
+		#for key, seq in
+	'''
+
+	return test, seqs_by_label
+
 def kmeans_pwm(trues, fakes, k, xv):
 	#print(trues)
 	#print(fakes)
 	#sys.stderr.write('\npkmeans_pwm\n')
-	pwm_thr_it = {}
-	pwm_for_true_label_it = {}
+	accuracy = []
 	for x in range(xv):
 		print(f'iteration {x}')
 
-		#splitting in train and test
-		#separate for fakes and trues in case we want to have fakes and trues to be a different length
-
-		train_trues, test_trues = [], []
-		for i in range(len(trues)):
-			if i % xv == x:
-				test_trues.append(trues[i])
-			else:
-				train_trues.append(trues[i])
-
-		train_fakes, test_fakes = [], []
-		for i in range(len(fakes)):
-			if i % xv == x:
-				test_fakes.append(fakes[i])
-			else:
-				train_fakes.append(fakes[i])
-		#print(len(train_trues), len(train_fakes))
-
-		one_dim_table = train_trues + train_fakes
-		#print(one_dim_table[0])
-		assert(k <= len(one_dim_table))
-
-		#print(len(one_dim_table))
-
-		list_bases = {'A': 1.0, 'C': 2.0, 'G': 3.0, 'T': 4.0}
-
-		converted_sequences = []
-
-		for i in range(len(one_dim_table)):
-			converted_sequences.append([])
-
-		for item in range(len(one_dim_table)):
-			for i in one_dim_table[item]:
-				if i in list_bases.keys():
-					converted_sequences[item].append(list_bases[i])
-
-		df = pd.DataFrame(converted_sequences)
-
-		headers = []
-		for i in range(len(converted_sequences[0])):
-			headers.append(str(f'p{i}'))
-		df.columns = headers
+		true_test, true_seqs_by_label = kmeans(trues, k, xv, x)
+		#print(true_thr)
+		t_pwm = {}
+		for t_label, t_seqs in true_seqs_by_label.items():
+			t_pwm[t_label] = make_pwm(t_seqs)
 
 
-		for num in range(2, k+1):
-			kmeans = KMeans(num).fit(df)
-			centroids = kmeans.cluster_centers_
-			#print('Number of clusters:', num, '\n',
-				  #'Labels:', kmeans.labels_)
-				  #'Centroids:','\n', centroids)
+		fake_test, fake_seqs_by_label= kmeans(fakes, k, xv, x)
+		#print(fake_thr)
+		f_pwm = {}
+		for f_label, f_seqs in fake_seqs_by_label.items():
+			f_pwm[f_label] = make_pwm(f_seqs)
 
-			###TRUES
-			true_seq_splitted_by_labels = {}
-
-			labels_true = kmeans.labels_[:len(train_trues)]
-
-			for label, sequence in zip(labels_true, train_trues):
-				#print(label, sequence)
-				if label in true_seq_splitted_by_labels:
-					true_seq_splitted_by_labels[label].append(sequence)
-				else:
-					true_seq_splitted_by_labels[label] = []
-					true_seq_splitted_by_labels[label].append(sequence)
-			#print('Complete true:', true_seq_splitted_by_labels)
+		test_set = true_test + fake_test
 
 
-			###FAKES
-			fake_seq_splitted_by_labels = {}
+		checking_seq_accuracy = {}
 
-			labels_fake = kmeans.labels_[len(train_trues):]
+		for test_seq in test_set:
+			t_final_score = 5e-324
+			for t_label, t_matrix in t_pwm.items():
+				t_score = 1
+				for t_base, t_probability_of_base in zip(test_seq, t_matrix):
+					t_score *= t_probability_of_base[t_base]
+				if t_score > t_final_score:
+					t_final_score = t_score
 
-			for label, sequence in zip(labels_fake, train_fakes):
-				if label in fake_seq_splitted_by_labels:
-					fake_seq_splitted_by_labels[label].append(sequence)
-				else:
-					fake_seq_splitted_by_labels[label] = []
-					fake_seq_splitted_by_labels[label].append(sequence)
-			#print('Complete fake', fake_seq_splitted_by_labels)
+			f_final_score = 5e-324
+			for f_label, f_matrix in f_pwm.items():
+				f_score = 1
+				for f_base, f_probability_of_base in zip(test_seq, f_matrix):
+					f_score *= f_probability_of_base[f_base]
 
-			#pwm
+				if f_score > f_final_score:
+					f_final_score = f_score
 
-			pwm_thr = {}
-			pwm_for_true_label = {}
+			if t_final_score > f_final_score:
+				checking_seq_accuracy[test_seq] = 'true'
 
-			for true_label, true_list_of_seq in true_seq_splitted_by_labels.items():
-				for fake_label, fake_list_of_seq in fake_seq_splitted_by_labels.items():
-					if true_label == fake_label: ###change later, because going over the same labels more than once
-						#print('checking',true_list_of_seq)
-						print('Label_true:', true_label)
-						print('Label_fake:', fake_label)
-						if true_label in pwm_thr:
-							pass
-						else:
-							pwm_for_true_label[true_label] = make_pwm(true_list_of_seq)
-							pwm_thr[true_label] = pwm_threshold(true_list_of_seq, fake_list_of_seq, xv)
-							###do i use both to create a threshold?
-
-			#print(pprint.pformat(pwm_thr))
-
-			###delete later if not needed
-			#pwm_thr_it[f'iteration {x}'] = pwm_thr
-			#pwm_for_true_label_it[f'iteration {x}'] = pwm_for_true_label
-
-			###test
-			print('threshold', pwm_thr)
-			print('length of test set', len(test_set))
-			print('length of fake test', len(test_fakes))
-			print('length of true test', len(test_trues))
-
-			test_set = test_trues + test_fakes
+			elif t_final_score < f_final_score:
+				checking_seq_accuracy[test_seq] = 'fake'
 
 
-			checking_pwm_for_each_label = {}
-			for label in range(num):
-				checking_pwm_for_each_label[label] = {}
-				checking_pwm_for_each_label[label]['trues'] = []
-				checking_pwm_for_each_label[label]['fakes'] = []
-
-			for label, pwm_p in pwm_for_true_label.items():
-				#tr = 0
-				#fl = 0
-				for test_seq in test_set:
-					score = 1
-					for base, probability_of_base in zip(test_seq, pwm_p):
-						score = score * probability_of_base[base]
-
-					if score > pwm_thr[label]:
-						#tr += 1
-						checking_pwm_for_each_label[label]['trues'].append(test_seq)
-						###highest score
-					elif score <= pwm_thr[label]:
-						#fl += 1
-						checking_pwm_for_each_label[label]['fakes'].append(test_seq)
-
-				#print('Label', label)
-				#print('Trues', tr)
-				#print('Fakes', fl)
-			#print(checking_pwm_for_each_label)
-
-			print('Number of clusters:', num)
-			for label, trues_fakes in checking_pwm_for_each_label.items():
-				print('Checking for each label', label)
-				t_correct = 0
-				t_mistake = 0
-
-				f_correct = 0
-				f_mistake = 0
-				for true_fake, sequences in trues_fakes.items():
-					for seq in sequences:
-						if true_fake == 'trues' and seq in test_trues:
-							t_correct += 1
-						elif true_fake == 'trues' and seq in test_fakes:
-							t_mistake += 1
-						elif true_fake == 'fakes' and seq in test_fakes:
-							f_correct += 1
-						elif true_fake == 'fakes' and seq in test_trues:
-							f_mistake += 1
-				print('Trues placed in trues:', t_correct)
-				print('Trues placed in false:', t_mistake)
-				print('Accuracy:', t_correct/(t_correct+t_mistake))
-				#print(t_correct + t_mistake)
-				print('Fakes placed in fakes:', f_correct)
-				print('Fakes placed in trues:', f_mistake)
-				print('Accuracy:', f_correct/(f_correct+f_mistake))
-				#print(f_correct+f_mistake)
-
-
-
-
-
-	#sys.exit()
-
-
-
-
-		###checking each training sequence by grabbing the seq from test and putting them in the approperiate category
-		#aggregating the score
-
-	#print(pwm_for_true_label_it, pwm_thr_it)
-	#sys.exit()
-	#pwm_thr_it = pprint.pformat(pwm_thr_it)
-	#pwm_for_true_label_it = pprint.pformat(pwm_for_true_label_it)
-
-
-
-
-
-				#print(true_label, fake_label)
-				#print(true_list_of_seq, fake_list_of_seq)
-						#print(pwm_threshold(true_list_of_seq, fake_list_of_seq, xv))
-
-			#threshhold for where we use fakes and trues of appropriate label
-			#split fakes and trues based on the labels, and then pass them to thre threshold
-
-	#print(pwm_thr_it)
-
-
-
+		true_correct = 0
+		true_mistake = 0
+		fake_correct = 0
+		fake_mistake = 0
+		for check_seq, tr_fake in checking_seq_accuracy.items():
+			if check_seq in true_test and tr_fake == 'true':
+				true_correct += 1
+			elif check_seq in true_test and tr_fake == 'fake':
+				true_mistake += 1
+			elif check_seq in fake_test and tr_fake == 'fake':
+				fake_correct += 1
+			elif check_seq in fake_test and tr_fake == 'true':
+				fake_mistake += 1
+		print((true_correct + fake_correct)/(true_correct + true_mistake + fake_correct + fake_mistake))
+		accuracy.append((true_correct + fake_correct)/(true_correct + true_mistake + fake_correct + fake_mistake))
 
 
 
@@ -680,5 +598,5 @@ def kmeans_pwm(trues, fakes, k, xv):
 		# aggregate scores for this k
 	# report highest performance
 
-	return
+	return print('Accuracy:', '{:.4f}'.format(sum(accuracy)/len(accuracy)))
 
