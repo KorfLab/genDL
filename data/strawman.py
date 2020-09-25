@@ -18,6 +18,10 @@ parser.add_argument('--x', required=False, type=int, default=2,
 	metavar='<int>', help='cross-validation level [%(default)i]')
 parser.add_argument('--k', required = False, type = int, default = 2,
 	metavar='<int>', help='number of clusters')
+parser.add_argument('--start', required = False, type = int, default = 0,
+	metavar='<int>', help='start of seqeunce')
+parser.add_argument('--end', required = False, type = int, default = 42,
+	metavar='<int>', help='end of seqeunce')
 parser.add_argument('--regex', action='store_true', help='test regex')
 parser.add_argument('--pwm', action='store_true', help='test pwm w/ threshold')
 parser.add_argument('--pvp', action='store_true', help='test pwm vs pwm')
@@ -26,8 +30,8 @@ parser.add_argument('--kmer', action='store_true', help='test kmers')
 parser.add_argument('--kpwm', action='store_true', help='test k pwms')
 arg = parser.parse_args()
 
-trues = strawlib.get_seqs(arg.true, arg.nt)
-fakes = strawlib.get_seqs(arg.fake, arg.nf)
+trues = strawlib.get_seqs(arg.true, arg.nt, arg.start, arg.end)
+fakes = strawlib.get_seqs(arg.fake, arg.nf, arg.start, arg.end)
 print('true_sequences:', len(trues))
 print('fake_sequences', len(fakes))
 
@@ -53,4 +57,4 @@ if arg.kmer:
 
 if arg.kpwm:
 	acc = strawlib.kmeans_pwm(trues, fakes, arg.k, arg.x)
-	#print(f'Kmeans PWMs: {acc:.4f}')
+	print(f'Kmeans PWMs: {acc:.4f}')
