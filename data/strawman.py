@@ -16,8 +16,10 @@ parser.add_argument('--nf', required=False, type=int, default=1000,
 	metavar='<int>', help='number of fake sequences to use [%(default)i]')
 parser.add_argument('--x', required=False, type=int, default=2,
 	metavar='<int>', help='cross-validation level [%(default)i]')
-parser.add_argument('--k', required = False, type = int, default = 2,
-	metavar='<int>', help='number of clusters')
+parser.add_argument('--kt', required = False, type = int, default = 2,
+	metavar='<int>', help='number of clusters for trues')
+parser.add_argument('--kf', required = False, type = int, default = 2,
+	metavar='<int>', help='number of clusters for fakes')
 parser.add_argument('--start', required = False, type = int, default = 0,
 	metavar='<int>', help='start of seqeunce')
 parser.add_argument('--end', required = False, type = int, default = 42,
@@ -56,5 +58,5 @@ if arg.kmer:
 	print(f'KMER Threshold: {acc:.4f}')
 
 if arg.kpwm:
-	acc = strawlib.kmeans_pwm(trues, fakes, arg.k, arg.x)
+	acc = strawlib.kmeans_pwm(trues, fakes, arg.kt, arg.kf, arg.x)
 	print(f'Kmeans PWMs: {acc:.4f}')
