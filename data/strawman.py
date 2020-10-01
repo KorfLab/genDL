@@ -60,3 +60,4 @@ if arg.kmer:
 if arg.kpwm:
 	acc = strawlib.kmeans_pwm(trues, fakes, arg.kt, arg.kf, arg.x)
 	print(f'Kmeans PWMs: {acc:.4f}')
+
