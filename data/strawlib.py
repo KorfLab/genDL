@@ -7,16 +7,18 @@ import random
 import pandas as pd
 from sklearn.cluster import KMeans
 import pprint
+import timeit
 
 def get_seqs(file, limit, start, end):
 	seqs = []
 	with gzip.open(file, mode='rt') as fp:
 		lines = fp.read().splitlines()
-		if limit > len(lines):
-			sys.stderr.write(f'limit {limit} exceeds sequences {len(lines)}\n')
 		random.shuffle(lines)
 		for i in range(limit):
 			seqs.append(lines[i][start:end])
+
+	dup = set(seqs)
+	#print('no duplicates:', len(dup), 'with duplicates:', len(seqs))
 
 	return seqs
 
@@ -264,67 +266,69 @@ def pwm_evaluate(pwm, t, tsites, fsites):
 
 	return tp, tn, fp, fn
 
-def pwm_threshold(trues, fakes, xv):
+def pwm_threshold(trues, fakes, xv, x):
 
 	#sys.stderr.write('\npwm_threshold\n')
 	sum_acc = 0
 	sum_acc_fake = 0
-	for x in range(xv):
+	#for x in range(xv):
 
-		# collect testing and training sets
-		train, test = [], []
-		for i in range(len(trues)):
-			if i % xv == x: test.append(trues[i])
-			else:           train.append(trues[i])
+	# collect testing and training sets
+	train, test = [], []
+	for i in range(len(trues)):
+		if i % xv == x: test.append(trues[i])
+		else:           train.append(trues[i])
 
-		# build pwm
-		pwm = make_pwm(train)
+	# build pwm
+	pwm = make_pwm(train)
 
-		# find maximum and minimum thresholds
-		tmax = 1
-		for i in range(len(pwm)):
-			max = 0
-			for c in pwm[i]:
-				if pwm[i][c] > max: max = pwm[i][c]
-			tmax *= max
-		tmin = 0.25 ** len(pwm)
+	# find maximum and minimum thresholds
+	tmax = 1
+	for i in range(len(pwm)):
+		max = 0
+		for c in pwm[i]:
+			if pwm[i][c] > max: max = pwm[i][c]
+		tmax *= max
+	tmin = 0.25 ** len(pwm)
 
-		# find max t by stepping down tmax by half each time
-		#sys.stderr.write(f'set-{x} ')
-		t = tmax
-		n = 0
-		acc_max = 0
-		self_max = None
-		while True:
-			t /= 2
-			if t < tmin: break # no sense going below tmin
+	# find max t by stepping down tmax by half each time
+	#sys.stderr.write(f'set-{x} ')
+	t = tmax
+	n = 0
+	acc_max = 0
+	self_max = None
 
-			stp, stn, sfp, sfn = pwm_evaluate(pwm, t, train, fakes)
 
-			# score against test set
-			tp, tn, fp, fn = pwm_evaluate(pwm, t, test, fakes)
-			if tp and stp:
-				#tpr = (tp + tn) / (tp + fn + tn)
-				#ppv = tp / (tp + fp)
-				#acc = (1.25*tpr*ppv)/(tpr+ppv*0.25)
-				acc = (tp + tn)/(tp+tn+fp+fn)
+	while True:
+		t /= 2
+		if t < tmin: break # no sense going below tmin
 
-				#acc = tp/(tp+fn)
-				#acc_fake = tn/(fp+tn)
+		stp, stn, sfp, sfn = pwm_evaluate(pwm, t, train, fakes)
 
-				#acc_fake = tn/(fp+tn)
-				if acc > acc_max:
-					acc_max = acc
-					#ssn = stp / (stp + sfn)
-					#ssp = stp / (stp + sfp)
-					#self_max = (1.25*ssn*ssp)/(ssn+ssp*0.25)
+		# score against test set
+		tp, tn, fp, fn = pwm_evaluate(pwm, t, test, fakes)
+		if tp and stp:
+			#tpr = (tp + tn) / (tp + fn + tn)
+			#ppv = tp / (tp + fp)
+			#acc = (1.25*tpr*ppv)/(tpr+ppv*0.25)
+			acc = (tp + tn)/(tp+tn+fp+fn)
 
-					self_max = (stp+stn)/(stp+stn+sfp+sfn)
+			#acc = tp/(tp+fn)
+			#acc_fake = tn/(fp+tn)
 
-					#self_max = (stp)/(stp+sfn)
-					#self_max_fake = (sfn)/(sfp+stn) ###
-		#sys.stderr.write(f' train:{self_max} test:{acc_max} t:{t}\n')
-		sum_acc += acc_max
+			#acc_fake = tn/(fp+tn)
+			if acc > acc_max:
+				acc_max = acc
+				#ssn = stp / (stp + sfn)
+				#ssp = stp / (stp + sfp)
+				#self_max = (1.25*ssn*ssp)/(ssn+ssp*0.25)
+
+				self_max = (stp+stn)/(stp+stn+sfp+sfn)
+
+				#self_max = (stp)/(stp+sfn)
+				#self_max_fake = (sfn)/(sfp+stn) ###
+	#sys.stderr.write(f' train:{self_max} test:{acc_max} t:{t}\n')
+	sum_acc += acc_max
 
 		#return t ###how to do this
 		#sum_acc_fake += acc_fake
@@ -463,25 +467,32 @@ def boosted_pwms(trues, fakes, xv):
 
 def kmeans(seqs, k, xv, x):
 	train, test = [], []
+
+	for i in range(len(seqs)):
+		train.append(seqs[i])
+
+
+	'''
 	for i in range(len(seqs)):
 		if i % xv == x:
 			test.append(seqs[i])
 		else:
 			train.append(seqs[i])
-
+	'''
 	assert(k<=len(train))
 
 	list_bases = {'A': 1.0, 'C': 2.0, 'G': 3.0, 'T': 4.0}
 
 	converted_sequences = []
-
 	for i in range(len(train)):
 		converted_sequences.append([])
+
 
 	for item in range(len(train)):
 		for i in train[item]:
 			if i in list_bases.keys():
 				converted_sequences[item].append(list_bases[i])
+
 
 	df = pd.DataFrame(converted_sequences)
 
@@ -495,97 +506,165 @@ def kmeans(seqs, k, xv, x):
 
 	seqs_by_label = {}
 	for label, seq in zip(kmeans.labels_, train):
+		###
 		if label in seqs_by_label:
 			seqs_by_label[label].append(seq)
 		else:
 			seqs_by_label[label] = []
 			seqs_by_label[label].append(seq)
-	'''
+
+	assert(len(seqs_by_label.keys()) == k)
+
+	return train, seqs_by_label
+
+def threshold_for_kpwm(seqs_by_label, xv, x):
 	storing_thr = {}
-	for thr_label, thr_seqs in seqs_by_label.items():
-		trues_thr = thr_seqs
+
+	for true_thr_label in seqs_by_label:
+		trues_thr = seqs_by_label[true_thr_label]
 		fakes_thr = []
 
+		for thr_label, thr_seqs in seqs_by_label.items():
+			if thr_label != true_thr_label:
+				fakes_thr += thr_seqs
+
+		storing_thr[true_thr_label] = pwm_threshold(trues_thr, fakes_thr, xv, x)
+
+	return storing_thr
 
 
-		temp_seqs_by_label = seqs_by_label
-		for temp_label, temp_seqs in temp_seqs_by_label.items():
-			if temp_label == thr_label:
-				pass
-			else:
-				fakes_thr = fakes_thr + temp_seqs_by_label[temp_label]
-		storing_thr[thr_label] = pwm_threshold(trues_thr, fakes_thr, xv)
-		#for key, seq in
-	'''
+	#print(storing_thr)
 
-	return test, seqs_by_label
+def optimal_length(trues, fakes, limit_trues, limit_fakes, kt, kf, xv):
+	if 'don' in trues:
+		beg = 23
+		end = 27
+		result_beg = 23
+		result_end = 27
+		highest_acc = 0.0
 
-def kmeans_pwm(trues, fakes, k, xv):
-	#print(trues)
-	#print(fakes)
+		for j in range(beg+1):
+			for i in range(43-end):
+				true_seqs = get_seqs(trues, limit_trues, beg, end)
+				fake_seqs = get_seqs(fakes, limit_fakes, beg, end)
+
+				acc = kmeans_pwm(true_seqs, fake_seqs, kt, kf, xv)
+				print(beg, end)
+				if acc > highest_acc:
+					highest_acc = acc
+					result_end = end
+					result_beg = beg
+				end += 1
+			end = 27
+			beg -= 1
+
+		return result_beg, result_end, highest_acc
+
+
+	elif 'acc' in trues:
+		beg = 20
+		end = 24
+		highest_acc = 0.0
+		result_beg = 20
+		result_end = 24
+
+		for i in range(43-end):
+			for j in range(beg+1):
+				print(beg, end)
+				true_seqs = get_seqs(trues, limit_trues, beg, end)
+				fake_seqs = get_seqs(fakes, limit_fakes, beg, end)
+
+				acc = kmeans_pwm(true_seqs, fake_seqs, kt, kf, xv)
+				if acc > highest_acc:
+					highest_acc = acc
+					result_beg = beg
+					result_end = end
+				beg -= 1
+			beg = 20
+			end += 1
+
+		return result_beg, result_end, highest_acc
+
+def manhattan_distance():
+	pass
+
+def kmeans_pwm(trues, fakes, kt, kf, xv):
+	start = timeit.default_timer()
 	#sys.stderr.write('\npkmeans_pwm\n')
 	accuracy = []
 	for x in range(xv):
 		print(f'iteration {x}')
 
-		true_test, true_seqs_by_label = kmeans(trues, k, xv, x)
-		#print(true_thr)
+		true_test, true_seqs_by_label = kmeans(trues, kt, xv, x)
+
 		t_pwm = {}
 		for t_label, t_seqs in true_seqs_by_label.items():
 			t_pwm[t_label] = make_pwm(t_seqs)
 
 
-		fake_test, fake_seqs_by_label= kmeans(fakes, k, xv, x)
-		#print(fake_thr)
+		fake_test, fake_seqs_by_label= kmeans(fakes, kf, xv, x)
+
 		f_pwm = {}
 		for f_label, f_seqs in fake_seqs_by_label.items():
 			f_pwm[f_label] = make_pwm(f_seqs)
 
-		test_set = true_test + fake_test
+		tp = 0
+		fn = 0
+		tn = 0
+		fp = 0
 
-
-		checking_seq_accuracy = {}
-
-		for test_seq in test_set:
-			t_final_score = 5e-324
+		for true_test_seq in true_test:
+			t_final_score = 0.0
 			for t_label, t_matrix in t_pwm.items():
 				t_score = 1
-				for t_base, t_probability_of_base in zip(test_seq, t_matrix):
+				for t_base, t_probability_of_base in zip(true_test_seq, t_matrix):
 					t_score *= t_probability_of_base[t_base]
 				if t_score > t_final_score:
 					t_final_score = t_score
 
-			f_final_score = 5e-324
+			f_final_score = 0.0
 			for f_label, f_matrix in f_pwm.items():
 				f_score = 1
-				for f_base, f_probability_of_base in zip(test_seq, f_matrix):
+				for f_base, f_probability_of_base in zip(true_test_seq, f_matrix):
 					f_score *= f_probability_of_base[f_base]
-
 				if f_score > f_final_score:
 					f_final_score = f_score
-
 			if t_final_score > f_final_score:
-				checking_seq_accuracy[test_seq] = 'true'
-
+				tp += 1
 			elif t_final_score < f_final_score:
-				checking_seq_accuracy[test_seq] = 'fake'
+				fn += 1
 
 
-		true_correct = 0
-		true_mistake = 0
-		fake_correct = 0
-		fake_mistake = 0
-		for check_seq, tr_fake in checking_seq_accuracy.items():
-			if check_seq in true_test and tr_fake == 'true':
-				true_correct += 1
-			elif check_seq in true_test and tr_fake == 'fake':
-				true_mistake += 1
-			elif check_seq in fake_test and tr_fake == 'fake':
-				fake_correct += 1
-			elif check_seq in fake_test and tr_fake == 'true':
-				fake_mistake += 1
-		print((true_correct + fake_correct)/(true_correct + true_mistake + fake_correct + fake_mistake))
-		accuracy.append((true_correct + fake_correct)/(true_correct + true_mistake + fake_correct + fake_mistake))
+		for fake_test_seq in fake_test:
+
+			t_final_score = 0.0
+			for t_label, t_matrix in t_pwm.items():
+				t_score = 1
+				for t_base, t_probability_of_base in zip(fake_test_seq, t_matrix):
+					t_score *= t_probability_of_base[t_base]
+				if t_score > t_final_score:
+					t_final_score = t_score
+				#print(t_score)
+
+			f_final_score = 0.0
+			for f_label, f_matrix in f_pwm.items():
+				f_score = 1
+				for f_base, f_probability_of_base in zip(fake_test_seq, f_matrix):
+					f_score *= f_probability_of_base[f_base]
+				if f_score > f_final_score:
+					f_final_score = f_score
+				#print(f_score)
+
+
+			if f_final_score > t_final_score:
+				tn += 1
+			elif t_final_score > f_final_score:
+				fp += 1
+
+		acc = (tp+tn)/(tp+tn+fn+fp)
+
+
+		accuracy.append(acc)
 
 
 
@@ -597,6 +676,11 @@ def kmeans_pwm(trues, fakes, k, xv):
 			# aggregate scores for these PWMs
 		# aggregate scores for this k
 	# report highest performance
+	#print('Accuracy:', '{:.4f}'.format(sum(accuracy)/len(accuracy)))
 
-	return print('Accuracy:', '{:.4f}'.format(sum(accuracy)/len(accuracy)))
+	#stop = timeit.default_timer()
+	#execution_time = stop - start
+
+	#print("Program Executed in "+str(execution_time))
+	return sum(accuracy)/len(accuracy)
 
