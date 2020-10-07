@@ -467,18 +467,12 @@ def boosted_pwms(trues, fakes, xv):
 
 def kmeans(seqs, k, xv, x):
 	train, test = [], []
-
-	for i in range(len(seqs)):
-		train.append(seqs[i])
-
-
-	'''
 	for i in range(len(seqs)):
 		if i % xv == x:
 			test.append(seqs[i])
 		else:
 			train.append(seqs[i])
-	'''
+
 	assert(k<=len(train))
 
 	list_bases = {'A': 1.0, 'C': 2.0, 'G': 3.0, 'T': 4.0}
@@ -515,7 +509,7 @@ def kmeans(seqs, k, xv, x):
 
 	assert(len(seqs_by_label.keys()) == k)
 
-	return train, seqs_by_label
+	return test, seqs_by_label
 
 def threshold_for_kpwm(seqs_by_label, xv, x):
 	storing_thr = {}
@@ -683,4 +677,7 @@ def kmeans_pwm(trues, fakes, kt, kf, xv):
 
 	#print("Program Executed in "+str(execution_time))
 	return sum(accuracy)/len(accuracy)
+
+
+
 
