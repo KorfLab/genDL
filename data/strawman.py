@@ -30,6 +30,7 @@ parser.add_argument('--pvp', action='store_true', help='test pwm vs pwm')
 parser.add_argument('--boost', action='store_true', help='test boosting pwm')
 parser.add_argument('--kmer', action='store_true', help='test kmers')
 parser.add_argument('--kpwm', action='store_true', help='test k pwms')
+parser.add_argument('--optl', action='store_true', help='find the length with the highest accuracy')
 arg = parser.parse_args()
 
 trues = strawlib.get_seqs(arg.true, arg.nt, arg.start, arg.end)
@@ -60,4 +61,8 @@ if arg.kmer:
 if arg.kpwm:
 	acc = strawlib.kmeans_pwm(trues, fakes, arg.kt, arg.kf, arg.x)
 	print(f'Kmeans PWMs: {acc:.4f}')
+
+if arg.optl:
+	beg_point, end_point, acc = strawlib.optimal_length(arg.true, arg.fake, arg.nt, arg.nf, arg.kt, arg.kf, arg.x)
+	print('Start:', beg_point, 'Stop:', end_point, 'Highest Accuracy:', f'{acc:.4f}')
 
