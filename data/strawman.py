@@ -16,8 +16,10 @@ parser.add_argument('--nf', required=False, type=int, default=1000,
 	metavar='<int>', help='number of fake sequences to use [%(default)i]')
 parser.add_argument('--x', required=False, type=int, default=2,
 	metavar='<int>', help='cross-validation level [%(default)i]')
-parser.add_argument('--k', required = False, type = int, default = 2,
-	metavar='<int>', help='number of clusters')
+parser.add_argument('--kt', required = False, type = int, default = 2,
+	metavar='<int>', help='number of clusters for trues')
+parser.add_argument('--kf', required = False, type = int, default = 2,
+	metavar='<int>', help='number of clusters for fakes')
 parser.add_argument('--start', required = False, type = int, default = 0,
 	metavar='<int>', help='start of seqeunce')
 parser.add_argument('--end', required = False, type = int, default = 42,
@@ -28,6 +30,7 @@ parser.add_argument('--pvp', action='store_true', help='test pwm vs pwm')
 parser.add_argument('--boost', action='store_true', help='test boosting pwm')
 parser.add_argument('--kmer', action='store_true', help='test kmers')
 parser.add_argument('--kpwm', action='store_true', help='test k pwms')
+parser.add_argument('--optl', action='store_true', help='find the length with the highest accuracy')
 arg = parser.parse_args()
 
 trues = strawlib.get_seqs(arg.true, arg.nt, arg.start, arg.end)
@@ -56,5 +59,10 @@ if arg.kmer:
 	print(f'KMER Threshold: {acc:.4f}')
 
 if arg.kpwm:
-	acc = strawlib.kmeans_pwm(trues, fakes, arg.k, arg.x)
+	acc = strawlib.kmeans_pwm(trues, fakes, arg.kt, arg.kf, arg.x)
 	print(f'Kmeans PWMs: {acc:.4f}')
+
+if arg.optl:
+	beg_point, end_point, acc = strawlib.optimal_length(arg.true, arg.fake, arg.nt, arg.nf, arg.kt, arg.kf, arg.x)
+	print('Start:', beg_point, 'Stop:', end_point, 'Highest Accuracy:', f'{acc:.4f}')
+
