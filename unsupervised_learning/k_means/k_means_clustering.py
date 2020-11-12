@@ -67,7 +67,7 @@ if arg.multiple == 'n':
     with open((arg.file),"r") as file:
         line = file.read().splitlines()
         random.shuffle(line)
-        print(len(line))
+        #print(len(line))
         #sys.exit()
         for i in range(arg.num):
             sequences.append(line[i][arg.min:arg.max])
@@ -136,15 +136,15 @@ for i in range(len(sequences[0][0])):
 df.columns = headers
 
 
-print(df)
+#print(df)
 
 kmeans = KMeans(n_clusters=arg.clusters).fit(df)
 #decreasing tolerance, increasing toleration
 centroids = kmeans.cluster_centers_
-print('Centroids:', centroids)
-print('Kmeans:', kmeans)
-print('labels:', kmeans.labels_)
-print(type(kmeans.labels_))
+#print('Centroids:', centroids)
+#print('Kmeans:', kmeans)
+#print('labels:', kmeans.labels_)
+#print(type(kmeans.labels_))
 
 
 
@@ -162,7 +162,7 @@ nested_dist = {}
 for i in range(len(keys)):
     nested_dist[keys[i]] = {}
     analyzing = kmeans.labels_[i*array_div:((i+1)*array_div)]
-    print(type(analyzing))
+    #print(type(analyzing))
 
     #print(analyzing, len(analyzing))
     for checking_label in analyzing:
@@ -174,7 +174,7 @@ for i in range(len(keys)):
 
 #print(nested_dist)
 neat_dict = pprint.pformat(nested_dist)
-print(neat_dict)
+#print(neat_dict)
 
 #nested_dist = OrderedDict(sorted(nested_dist.items()))
 #clusters
