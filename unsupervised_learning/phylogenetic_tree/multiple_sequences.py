@@ -37,11 +37,11 @@ with open((arg.file1),"r") as file:
     line = file.read().splitlines()
     random.shuffle(line)
     for i in range(arg.num):
-        print(line[i][arg.min:arg.max])
+        #print(line[i][arg.min:arg.max])
         value1.append(line[i])
 
 dict_k_means[key1] = value1
-print(len(value1))
+#print(len(value1))
 
 
 
@@ -57,7 +57,7 @@ if arg.file2 is not None:
             value2.append(line[i][arg.min:arg.max])
 
     dict_k_means[key2] = value2
-    print(len(value2))
+    #print(len(value2))
 
 
 
@@ -74,7 +74,7 @@ if arg.file3 is not None:
 
     dict_k_means[key3] = value3
 
-    print(len(value3))
+    #print(len(value3))
 #print(dict_k_means)
 
 new = yaml.dump(dict_k_means)

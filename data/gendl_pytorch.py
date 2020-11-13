@@ -3,9 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F #contains the convolutional functions such as conv1d
 import torch.optim as optim
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import argparse
 import sys
 import gzip
@@ -24,23 +21,9 @@ parser.add_argument('--epoch', required=False, type=int, default = 10,
     metavar='<int>', help='number of epochs')
 parser.add_argument('--batch', required=False, type=int, default = 1,
     metavar='<int>', help='batch size')
+
 arg = parser.parse_args()
 
-'''
-#in case if I were to switch to pandas df
-def get_seqs(file, limit, start, end):
-    seqs = []
-    with gzip.open(file, mode='rt') as fp:
-        lines = fp.read().splitlines()
-        random.shuffle(lines)
-        for i in range(limit):
-            seqs.append(lines[i][start:end])
-
-    dup = set(seqs)
-    #print('no duplicates:', len(dup), 'with duplicates:', len(seqs))
-
-    return seqs
-'''
 #unpacking one hot encoding
 true = pickle.load(open(arg.true, "rb"))
 fake = pickle.load(open(arg.fake, "rb"))
@@ -57,31 +40,34 @@ seq_train, seq_val, label_train, label_val = train_test_split(seqs, labels, test
 print(seq_train.shape, seq_val.shape, label_train.shape, label_val.shape)
 
 #loading data
-train_seqs = torch.utils.data.DataLoader(seq_train, batch_size = 5, shuffle = False)
-train_labels = torch.utils.data.DataLoader(label_train, batch_size = 5, shuffle = False)
+train_seqs = torch.utils.data.DataLoader(seq_train, batch_size = arg.batch, shuffle = False)
+train_labels = torch.utils.data.DataLoader(label_train, batch_size = arg.batch, shuffle = False)
 
 val_seqs = torch.utils.data.DataLoader(seq_val, batch_size = 1, shuffle = False)
 val_labels = torch.utils.data.DataLoader(label_val, batch_size = 1, shuffle = False)
 
-#classes = ('true', 'fake')
 
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        #self.conv1 = nn.Conv2d(in_channels = 1, out_channels= 6, kernel_size = 5)
-        #self.conv2 = nn.Conv2d(in_channels = 6, out_channels = 16, kernel_size = 5)
+        #self.conv1 = nn.Conv1d(in_channels = 42, out_channels= 84 , kernel_size = 2)
+        #self.maxpool = nn.MaxPool2d(42, stride=2)
         self.fc1 = nn.Linear(in_features=168, out_features=84)
         self.fc2 = nn.Linear(in_features=84, out_features=42)
+        #self.conv2 = nn.Conv2d(in_channels = 42, out_channels = 42, kernel_size = 3)
         self.fc3 = nn.Linear(in_features=42, out_features=24)
         self.fc4 = nn.Linear(in_features=24, out_features=12)
         self.out = nn.Linear(in_features=12, out_features=1) ###
         ###dropout
         ###implement number of layers and types of layers
         #optimize the way to search the models with the best performance
+        ###optimize the way to search the models with the best performance
 
 
     def forward(self, t):
         #t = F.relu(self.conv1(t))
+
+        t = t.flatten(start_dim=1)
         #t = F.max_pool2d(t, kernel_size=2, stride=2)
 
         #t = F.relu(self.conv2(t))
@@ -92,6 +78,7 @@ class Net(nn.Module):
         t = F.dropout(t, training=self.training)
         t = F.elu(self.fc2(t))
         t = F.dropout(t, training=self.training)
+        #t = F.elu(self.conv2())
         t = torch.tanh(self.fc3(t))
         t = F.dropout(t, training=self.training)
         t = torch.tanh(self.fc4(t))
@@ -101,8 +88,38 @@ class Net(nn.Module):
 
         return (t)
 
+class DynamicNet(nn.Module):
+    def __init__(self, input_dim, hidden_dim_array, non_linear_function_array):
+        super().__init__()
+        self.linear_functions = []
+        self.non_linear_functions = [x() for x in non_linear_function_array]
+        self.hidden_layers = len(hidden_dim_array)
+        for l in range(self.hidden_layers):
+            self.linear_functions.append(nn.Linear(input_dim, hidden_dim_array[l]))
+            input_dim = hidden_dim_array[l]
+        self.linear_functions = nn.ModuleList(self.linear_functions)
+        self.final_layer = nn.Linear(input_dim, 1)
 
-net = Net()
+    def forward(self, x):
+        out = x
+        out = out.flatten(start_dim = 1)
+        for i in range(self.hidden_layers): #include the last layer as well
+            out = self.linear_functions[i](out)
+            out = self.non_linear_functions[i](out)
+        #out = self.final_linear(out)
+        ###might what to use other functions (specify the last layer)
+        out = torch.sigmoid(self.final_layer(out))
+        #out = self.final_layer(x)
+        #t = torch.sigmoid(self.out(t))
+        return out
+net = DynamicNet(((len(seqs[0]))*4), [10, 50], [nn.Tanh, nn.Tanh])
+##add the dropout
+
+##make up two networks and train them = show the result side by side
+#sys.exit()
+#model = FNNModule(input_dim, output_dim, 100, 50, nn.Tanh)
+
+
 #defining a loss function and optimizer
 criterion = nn.BCELoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay = 1e-4)
@@ -111,7 +128,8 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay = 1
 #training the network
 #print(len(train_seqs))
 #print(len(train_labels))
-for epoch in range(10):  # loop over the dataset multiple times
+
+for epoch in range(arg.epoch):  # loop over the dataset multiple times
     running_loss = 0.0
     for i, data in enumerate(zip(train_seqs, train_labels), 0):
         seq, label = data
@@ -170,7 +188,6 @@ with torch.no_grad():
         #print(test_seq.shape)
         #sys.exit()
         outputs = net(test_seq)
-        #print(outputs)
         #sys.exit()
         #_, predicted = torch.max(outputs, 1)
         #print(predicted)
