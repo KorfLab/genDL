@@ -72,6 +72,10 @@ val_labels = torch.utils.data.DataLoader(label_val, batch_size = 1, shuffle = Fa
 
 #classes = ('true', 'fake')
 
+def file():
+    pass
+
+
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -109,8 +113,9 @@ class Net(nn.Module):
 
         return (t)
 
+
 class DynamicNet(nn.Module):
-    def __init__(self, input_dim, output_dim, hidden_dim_array, non_linear_function_array):
+    def __init__(self, input_dim, hidden_dim_array, non_linear_function_array):
         super().__init__()
         self.linear_functions = []
         self.non_linear_functions = [x() for x in non_linear_function_array]
@@ -119,17 +124,30 @@ class DynamicNet(nn.Module):
             self.linear_functions.append(nn.Linear(input_dim, hidden_dim_array[l]))
             input_dim = hidden_dim_array[l]
         self.linear_functions = nn.ModuleList(self.linear_functions)
-        self.final_linear = nn.Linear(input_dim, output_dim)
+        self.final_layer = nn.Linear(input_dim, 1)
 
     def forward(self, x):
         out = x
-        for i in range(self.hidden_layers):
+        out = out.flatten(start_dim = 1)
+        for i in range(self.hidden_layers): #include the last layer as well
             out = self.linear_functions[i](out)
             out = self.non_linear_functions[i](out)
-        out = self.final_linear(out)
+        #out = self.final_linear(out)
+        ###might what to use other functions (specify the last layer)
+        out = torch.sigmoid(self.final_layer(out))
+        #out = self.final_layer(x)
+        #t = torch.sigmoid(self.out(t))
         return out
+net = DynamicNet(((len(seqs[0]))*4), [10, 50], [nn.Tanh, nn.Tanh])
+##add the dropout
 
-net = Net()
+##make up two networks and train them = show the result side by side
+#sys.exit()
+#model = FNNModule(input_dim, output_dim, 100, 50, nn.Tanh)
+
+#net = Net()
+print(net)
+#sys.exit()
 #defining a loss function and optimizer
 criterion = nn.BCELoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay = 1e-4)
@@ -197,7 +215,6 @@ with torch.no_grad():
         #print(test_seq.shape)
         #sys.exit()
         outputs = net(test_seq)
-        #print(outputs)
         #sys.exit()
         #_, predicted = torch.max(outputs, 1)
         #print(predicted)
