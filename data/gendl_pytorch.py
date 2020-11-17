@@ -60,10 +60,6 @@ class Net(nn.Module):
         self.fc3 = nn.Linear(in_features=42, out_features=24)
         self.fc4 = nn.Linear(in_features=24, out_features=12)
         self.out = nn.Linear(in_features=12, out_features=1) ###
-        ###dropout
-        ###implement number of layers and types of layers
-        #optimize the way to search the models with the best performance
-        ###optimize the way to search the models with the best performance
 
 
     def forward(self, t):
@@ -113,15 +109,10 @@ for net in nets:
             seq, label = data
             # zero the parameter gradients
             optimizer.zero_grad()
-
-            # forward + backward + optimize
-            #seq = torch.tensor(seq, dtype=torch.float32)
             seq = seq.float()
-            #seq = seq.clone().detach()
             label = label.float()
             outputs = net(seq)
             #print(outputs, label)
-            #sys.exit()
             loss = criterion(outputs, label)
             loss.backward()
             optimizer.step()
@@ -143,23 +134,16 @@ for net in nets:
             #test_seq = test_seq.clone().detach()
             #test_seq = torch.tensor(test_seq, dtype=torch.float32)
             test_seq = test_seq.float()
-            #print(test_seq.shape)
-            #sys.exit()
             outputs = net(test_seq)
-            #sys.exit()
-            #_, predicted = torch.max(outputs, 1)
-            #print(predicted)
-
-            predicted = torch.round(outputs) ### max always gives me 0 no matter what
+            predicted = torch.round(outputs)
+            #torch.mac() = 0 always
             total += test_label.size(0)
-            #print(predicted, test_label)
-            #sys.exit()
             if predicted == test_label:
                 correct += 1
     accuracy.append((correct/total))
 
 for i in range(len(accuracy)):
-    print(f'Accuracy of model {i}:{accuracy[i]:.4f}')
+    print(f'Accuracy of model {i}: {accuracy[i]:.4f}')
 #print(f'Accuracy of the network on the test sequences: {(correct/total):.4f}')
 
 ###checking on the train - round works, while max does not
