@@ -14,7 +14,7 @@ import ast
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-from kmodes.kmodes import KModes
+#from kmodes.kmodes import KModes
 
 def get_seqs(file, limit, start, end):
 	seqs = []
@@ -1051,7 +1051,7 @@ def train_and_test_in_kmeans(trues, fakes, kt, xv, nt, nf):
 		#print(m, i, dictionary)
 	return
 
-from apyori import apriori
+#from apyori import apriori
 def using_apriori(trues, fakes, xv, nt, nf):
 	plt.style.use('seaborn-deep')
 
