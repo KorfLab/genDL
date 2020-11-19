@@ -87,19 +87,20 @@ class Net(nn.Module):
         return (t)
 
 
-model1 = DynamicNet(((len(seqs[0]))*4), [42, 21, 12, 5], [nn.ReLU, nn.Tanh, nn.Tanh, nn.Tanh])
-model2 = DynamicNet(((len(seqs[0]))*4), [336, 168, 42, 21], [nn.Tanh, nn.Tanh, nn.Tanh, nn.Tanh])
+model1 = DynamicNet(((len(seqs[0]))*4), [336, 168, 42, 21], [nn.ReLU, nn.ReLU, nn.ReLU, nn.ReLU], [0.2, 0.2, 0.2, 0.2])
+model2 = DynamicNet(((len(seqs[0]))*4), [336, 168, 42, 21], [nn.Tanh, nn.Tanh, nn.Tanh, nn.Tanh], [0.2, 0.2, 0.2, 0.2])
+model3 = DynamicNet(((len(seqs[0]))*4), [336, 168, 42, 21], [nn.ReLU, nn.ReLU, nn.ReLU, nn.ReLU], [0.7, 0.7, 0.8, 0.9])
 
 nets = []
 nets.append(model1)
 nets.append(model2)
+nets.append(model3)
 
 #training the network
 #print(len(train_seqs))
 #print(len(train_labels))
 accuracy = []
 for net in nets:
-
     #defining a loss function and optimizer
     criterion = nn.BCELoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay = 1e-4)
@@ -120,12 +121,10 @@ for net in nets:
             # print statistics
             running_loss += loss.item()
             if i % 100 == 0:    # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i, running_loss / 100))
+                print('[%d, %5d] loss: %.3f' % (epoch + 1, i, running_loss / 100))
                 running_loss = 0.0
 
     print('Finished Training')
-
 
     correct = 0
     total = 0
@@ -144,6 +143,8 @@ for net in nets:
 
 for i in range(len(accuracy)):
     print(f'Accuracy of model {i}: {accuracy[i]:.4f}')
+
+
 #print(f'Accuracy of the network on the test sequences: {(correct/total):.4f}')
 
 ###checking on the train - round works, while max does not
