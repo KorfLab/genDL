@@ -86,15 +86,9 @@ class Net(nn.Module):
 
         return (t)
 
-
-model1 = DynamicNet(((len(seqs[0]))*4), [336, 168, 42, 21], [nn.ReLU, nn.ReLU, nn.ReLU, nn.ReLU], [0.2, 0.2, 0.2, 0.2])
-model2 = DynamicNet(((len(seqs[0]))*4), [336, 168, 42, 21], [nn.Tanh, nn.Tanh, nn.Tanh, nn.Tanh], [0.2, 0.2, 0.2, 0.2])
-model3 = DynamicNet(((len(seqs[0]))*4), [336, 168, 42, 21], [nn.ReLU, nn.ReLU, nn.ReLU, nn.ReLU], [0.7, 0.7, 0.8, 0.9])
-
+model9 = DynamicNet(((len(seqs[0]))*4), [21, 10], [nn.ELU, nn.ELU], [0.1, 0.1])
 nets = []
-nets.append(model1)
-nets.append(model2)
-nets.append(model3)
+nets.append(model9)
 
 #training the network
 #print(len(train_seqs))
@@ -103,7 +97,9 @@ accuracy = []
 for net in nets:
     #defining a loss function and optimizer
     criterion = nn.BCELoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay = 1e-4)
+    #optimizer = optim.SGD(net.parameters(), lr=1e-4, momentum=0.9, weight_decay = 1e-4)
+    optimizer = optim.Adam(net.parameters(), lr=1e-4, weight_decay = 1e-4)
+    ##try a different optimizer
     for epoch in range(arg.epoch):  # loop over the dataset multiple times
         running_loss = 0.0
         for i, data in enumerate(zip(train_seqs, train_labels), 0):
@@ -142,11 +138,8 @@ for net in nets:
     accuracy.append((correct/total))
 
 for i in range(len(accuracy)):
-    print(f'Accuracy of model {i}: {accuracy[i]:.4f}')
+    print(f'Accuracy of model {i+1}: {accuracy[i]:.4f}')
 
+###graphic of the network (weights and bias for each node)
 
 #print(f'Accuracy of the network on the test sequences: {(correct/total):.4f}')
-
-###checking on the train - round works, while max does not
-###how the network is being initialized
-###drop, regular, learning rate
