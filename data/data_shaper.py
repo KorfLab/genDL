@@ -23,11 +23,15 @@ parser.add_argument('--number', required=False, type=int, default=1000,
 	metavar='<int>', help='number of examples desired. -1 if you want all data')
 parser.add_argument('--window', required=False, type=int, default=42,
 	metavar='<int>', help='size of sequences')
+parser.add_argument('--start', required=False, type=int, default=0,
+	metavar='<int>', help='start of sequences')
+parser.add_argument('--stop', required=False, type=int, default=42,
+	metavar='<int>', help='stop sequences')
 
 dna_int = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
 int_dna = {0: 'A', 1: 'C', 2: 'G', 3: 'G'}
 
-def read_data(filename, win):
+def read_data(filename, win, start, stop):
 	fp = None
 
 	if filename.endswith('.gz'):
@@ -38,8 +42,8 @@ def read_data(filename, win):
 	for line in fp.readlines():
 		line = line.rstrip()
 		assert(len(line) == win)
-		yield(line)
-		
+		yield(line[start:stop])
+
 	fp.close()
 
 def to_integer(seq):
@@ -48,11 +52,11 @@ def to_integer(seq):
 		intlist.append(dna_int[nt])
 	return np.array(intlist, dtype=np.uint8)
 
-def seqs_list(filename, win):
+def seqs_list(filename, win, start, stop):
 	seqs = list()
-	for seq in read_data(filename, win):
+	for seq in read_data(filename, win, start, stop):
 		seqs.append(to_integer(seq))
-	
+
 	return seqs
 
 def pickling(type='acceptor', level='true', size='1000', data=[]):
@@ -64,32 +68,35 @@ def pickling(type='acceptor', level='true', size='1000', data=[]):
 	pickle_out = open(filepath, "wb")
 	pickle.dump(data, pickle_out)
 	pickle_out.close()
-	
-def one_hotter(file, size, win):
-	seqs = seqs_list(file, win)
+
+def one_hotter(file, size, win, start, stop):
+	seqs = seqs_list(file, win, start, stop)
 	random.shuffle(seqs)
 	if size == -1:
 		arg.number = len(seqs)
 
-	array = np.zeros((size, win, 4), dtype=np.float64)
+	array = np.zeros((size, stop-start, 4), dtype=np.float64)
 	for i, seq in enumerate(seqs[:size]):
-		encoded = keras.utils.to_categorical(seq, 
+		encoded = keras.utils.to_categorical(seq,
 											 num_classes=4,
 											 dtype=np.float64)
-		
+
 		array[i,:,:] = encoded
-	
+
 	return array
 
 if __name__ == '__main__':
 
 	arg = parser.parse_args()
-	
+
 	assert(os.path.isdir('/'.join((os.getcwd(), 'one_hot'))))
 	assert(arg.type == 'acceptor' or arg.type == 'donor')
-	assert(arg.level == 'hi' or arg.level == 'lo' or arg.level == 'hilo' or 
-	arg.level == 'fake')	
+	assert(arg.level == 'hi' or arg.level == 'lo' or arg.level == 'hilo' or
+	arg.level == 'fake')
 
-	data_set = one_hotter(arg.seqs, arg.number, arg.window)
+	if arg.stop - arg.start == arg.window:
+		data_set = one_hotter(arg.seqs, arg.number, arg.window, arg.start, arg.stop)
+	else:
+		data_set = one_hotter(arg.seqs, arg.number, arg.window, arg.start, arg.stop)
 
 	pickling(type=arg.type,level=arg.level,size=arg.number,data=data_set)
