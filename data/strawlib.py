@@ -531,8 +531,11 @@ def kmeans(seqs, k, xv, x):
 			seqs_by_label[label] = []
 			seqs_by_label[label].append(seq)
 	assert(len(seqs_by_label.keys()) == k)
-	'''
-	########################################
+
+	PCA_kmeans(df, seqs, k)
+	return test, seqs_by_label
+
+def PCA_kmeans(df, seqs, k):
 	x = df.values
 	x_std = StandardScaler().fit_transform(df)
 
@@ -555,7 +558,7 @@ def kmeans(seqs, k, xv, x):
 	plt.ylabel('explained_variance_ratio')
 	plt.xlabel('Principal Components')
 	plt.legend(loc='best')
-	print('general1')
+	#print('general1')
 	plt.show()
 
 	#PCA Analysis
@@ -574,8 +577,7 @@ def kmeans(seqs, k, xv, x):
 	plt.scatter(x_9d[:,0], x_9d[:,1], c = label_color, alpha = 0.5)
 	#print('general3')
 	plt.show()
-	'''
-	return test, seqs_by_label
+
 
 def optimal_length(trues, fakes, limit_trues, limit_fakes, kt, kf, xv):
 	if 'don' in trues:
@@ -750,7 +752,7 @@ def kmeans_pwm(trues, fakes, kt, kf, xv, start):
 	# report highest performance
 	#print('Accuracy:', '{:.4f}'.format(sum(accuracy)/len(accuracy)))
 	#pprint.pprint(storing_manhattan_distance)
-	return sum(accuracy)/len(accuracy), false_p, false_n
+	return sum(accuracy)/len(accuracy)
 
 def exhaustive_method(trues, fakes, xv, beg, end):
 	storing_results = {}
