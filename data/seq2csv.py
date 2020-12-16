@@ -34,30 +34,32 @@ def readseq(path, o, l):
 	return seqs
 
 def seq2int(seqs, label, n):
-	count = 0
+	output = []
 	for s in seqs:
-		val = [label]
+		val = []
 		for nt in s:
 			if   nt == 'A': val.append('1')
 			elif nt == 'C': val.append('2')
 			elif nt == 'G': val.append('3')
 			else:           val.append('4')
-		count += 1
-		print(','.join(val))
-		if count == n: return
+		val.append(label)
+		output.append(','.join(val))
+		if len(output) == n:
+			return output
 		
 def seq2hot(seqs, label, n):
-	count = 0
+	output = []
 	for s in seqs:
-		val = [label]
+		val = []
 		for nt in s:
 			if   nt == 'A': val.append('1,0,0,0')
 			elif nt == 'C': val.append('0,1,0,0')
 			elif nt == 'G': val.append('0,0,1,0')
 			else:           val.append('0,0,0,1')
-		count += 1
-		print(','.join(val))
-		if count == n: return
+		val.append(label)
+		output.append(','.join(val))
+		if len(output) == n:
+			return output
 
 true = readseq(arg.file1, arg.offset, arg.length)
 fake = readseq(arg.file2, arg.offset, arg.length)
@@ -66,10 +68,13 @@ assert(len(true) >= arg.count1)
 assert(len(fake) >= arg.count2)
 
 if arg.onehot:
-	seq2hot(true, '1', arg.count1)
-	seq2hot(fake, '0', arg.count2)
+	t = seq2hot(true, 't', arg.count1)
+	f = seq2hot(fake, 'f', arg.count2)
 else:
-	seq2int(true, '1', arg.count1)
-	seq2int(fake, '0', arg.count2)
+	t = seq2int(true, 't', arg.count1)
+	f =seq2int(fake, 'f', arg.count2)
 
+all = t + f
+random.shuffle(all)
+for line in all: print(line)
 	
