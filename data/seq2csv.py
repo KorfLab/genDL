@@ -17,8 +17,6 @@ parser.add_argument('--offset', required=True, type=int,
 	metavar='<int>', help='left-hand offset')
 parser.add_argument('--length', required=True, type=int,
 	metavar='<int>', help='length of sequence')
-parser.add_argument('--onehot', required=False, action='store_true',
-	help='length of sequence')
 parser.add_argument('--fixseed', required=False, action='store_true',
 	help='length of sequence')
 arg = parser.parse_args()
@@ -35,20 +33,6 @@ def readseq(path, o, l):
 	random.shuffle(seqs)
 	return seqs
 
-def seq2int(seqs, label, n):
-	output = []
-	for s in seqs:
-		val = []
-		for nt in s:
-			if   nt == 'A': val.append('1')
-			elif nt == 'C': val.append('2')
-			elif nt == 'G': val.append('3')
-			else:           val.append('4')
-		val.append(label)
-		output.append(','.join(val))
-		if len(output) == n:
-			return output
-		
 def seq2hot(seqs, label, n):
 	output = []
 	for s in seqs:
@@ -63,7 +47,7 @@ def seq2hot(seqs, label, n):
 		if len(output) == n:
 			return output
 
-if __name__ eq '__main__':
+if __name__ == '__main__':
 
 	if arg.fixseed: random.seed(1)
 
@@ -73,12 +57,8 @@ if __name__ eq '__main__':
 	assert(len(true) >= arg.count1)
 	assert(len(fake) >= arg.count2)
 
-	if arg.onehot:
-		t = seq2hot(true, 't', arg.count1)
-		f = seq2hot(fake, 'f', arg.count2)
-	else:
-		t = seq2int(true, 't', arg.count1)
-		f =seq2int(fake, 'f', arg.count2)
+	t = seq2hot(true, 't', arg.count1)
+	f = seq2hot(fake, 'f', arg.count2)
 
 	all = t + f
 	random.shuffle(all)
