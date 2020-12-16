@@ -19,6 +19,8 @@ parser.add_argument('--length', required=True, type=int,
 	metavar='<int>', help='length of sequence')
 parser.add_argument('--onehot', required=False, action='store_true',
 	help='length of sequence')
+parser.add_argument('--fixseed', required=False, action='store_true',
+	help='length of sequence')
 arg = parser.parse_args()
 
 def readseq(path, o, l):
@@ -61,20 +63,24 @@ def seq2hot(seqs, label, n):
 		if len(output) == n:
 			return output
 
-true = readseq(arg.file1, arg.offset, arg.length)
-fake = readseq(arg.file2, arg.offset, arg.length)
+if __name__ eq '__main__':
 
-assert(len(true) >= arg.count1)
-assert(len(fake) >= arg.count2)
+	if arg.fixseed: random.seed(1)
 
-if arg.onehot:
-	t = seq2hot(true, 't', arg.count1)
-	f = seq2hot(fake, 'f', arg.count2)
-else:
-	t = seq2int(true, 't', arg.count1)
-	f =seq2int(fake, 'f', arg.count2)
+	true = readseq(arg.file1, arg.offset, arg.length)
+	fake = readseq(arg.file2, arg.offset, arg.length)
 
-all = t + f
-random.shuffle(all)
-for line in all: print(line)
+	assert(len(true) >= arg.count1)
+	assert(len(fake) >= arg.count2)
+
+	if arg.onehot:
+		t = seq2hot(true, 't', arg.count1)
+		f = seq2hot(fake, 'f', arg.count2)
+	else:
+		t = seq2int(true, 't', arg.count1)
+		f =seq2int(fake, 'f', arg.count2)
+
+	all = t + f
+	random.shuffle(all)
+	for line in all: print(line)
 	
