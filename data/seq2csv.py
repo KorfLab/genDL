@@ -66,10 +66,10 @@ assert(len(true) >= arg.count1)
 assert(len(fake) >= arg.count2)
 
 if arg.onehot:
-	seq2hot(true, 't', arg.count1)
-	seq2hot(fake, 'f', arg.count2)
+	seq2hot(true, '1', arg.count1)
+	seq2hot(fake, '0', arg.count2)
 else:
-	seq2int(true, 't', arg.count1)
-	seq2int(fake, 'f', arg.count2)
+	seq2int(true, '1', arg.count1)
+	seq2int(fake, '0', arg.count2)
 
 	
