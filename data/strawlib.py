@@ -532,7 +532,7 @@ def kmeans(seqs, k, xv, x):
 			seqs_by_label[label].append(seq)
 	assert(len(seqs_by_label.keys()) == k)
 
-	PCA_kmeans(df, seqs, k)
+	#PCA_kmeans(df, seqs, k)
 	return test, seqs_by_label
 
 def PCA_kmeans(df, seqs, k):
