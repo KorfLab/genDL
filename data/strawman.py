@@ -38,6 +38,7 @@ parser.add_argument('--kpwm', action='store_true', help='test k pwms')
 parser.add_argument('--optl', action='store_true', help='find the length with the highest accuracy')
 parser.add_argument('--apriori', action='store_true', help='testing using apriori algorithm')
 parser.add_argument('--exh', action='store_true', help='doing the exhaustive search')
+parser.add_argument('--pca', action='store_true', help='pca on kmeans')
 arg = parser.parse_args()
 
 
@@ -68,15 +69,8 @@ if arg.kmer:
 	print(f'KMER Threshold: {acc:.4f}')
 
 if arg.kpwm:
-	acc, false_p, false_n = strawlib.kmeans_pwm(trues, fakes, arg.kt, arg.kf, arg.x, arg.start)
+	acc = strawlib.kmeans_pwm(trues, fakes, arg.kt, arg.kf, arg.x, arg.start)
 	print(f'Kmeans PWMs: {acc:.4f}')
-
-	print('False positive')
-	for i in false_p[0:6]:
-		print(i)
-	print('False negative')
-	for i in false_n[0:6]:
-		print(i)
 
 if arg.optl:
 	beg_point, end_point, acc = strawlib.optimal_length(arg.true, arg.fake, arg.nt, arg.nf, arg.kt, arg.kf, arg.x)
