@@ -1,4 +1,3 @@
-
 import argparse
 import gzip
 import random
@@ -62,5 +61,5 @@ if __name__ == '__main__':
 
 	all = t + f
 	random.shuffle(all)
-	for line in all: print(line)
-	
+	for line in all:
+		print(line)

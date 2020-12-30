@@ -9,7 +9,7 @@ import sys
 
 class DynamicNet(nn.Module):
 	def __init__(self, input_dim, hidden_dim_array, non_linear_function_array, prob = []):
-		super().__init__()
+		super(DynamicNet, self).__init__()
 		### for getattr
 		self.input_dimension = input_dim
 		self.hid_dim = hidden_dim_array
@@ -55,3 +55,21 @@ class DynamicNet(nn.Module):
 			#t = F.dropout(t, training=self.training)
 		out = torch.sigmoid(self.final_layer(out))
 		return out
+
+'''
+Need:
+input dimension
+number of hidden layers
+nodes in each of the hidden layers
+activation energy
+dropout
+initialization
+'''
+class Dynamic(nn.Module):
+	def __init__(self, input_dim, hidden_dim_array, non_linear_functions, initialization=[], dropout_prob=[]):
+		super(Dynamic, self).__init__()
+		for i in range(len(hidden_dim_array)+1):
+			print(i)
+		sys.exit()
+		pass
+
