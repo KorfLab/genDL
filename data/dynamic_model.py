@@ -40,7 +40,7 @@ class DynamicNet(nn.Module):
 
 	def forward(self, x):
 		out = x
-		out = out.flatten(start_dim = 1)
+		#out = out.flatten(start_dim = 1)
 		for i in range(self.hidden_layers): #include the last layer as well
 			out = self.linear_functions[i](out)
 			#non_linear_function = self.non_linear_functions[i]
@@ -65,11 +65,4 @@ activation energy
 dropout
 initialization
 '''
-class Dynamic(nn.Module):
-	def __init__(self, input_dim, hidden_dim_array, non_linear_functions, initialization=[], dropout_prob=[]):
-		super(Dynamic, self).__init__()
-		for i in range(len(hidden_dim_array)+1):
-			print(i)
-		sys.exit()
-		pass
 
