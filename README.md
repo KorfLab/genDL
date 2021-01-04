@@ -3,6 +3,29 @@ genDL
 
 Genomic experiments in Deep Learning
 
+## Directory Structure ##
+
+* arch - archive of old stuff which may get removed
+* data - raw data files and scripts for managing/generating data files
+* docs - tutorial, API
+* gendl - shared libraries (include in PYTHONPATH)
+	* pwmlib
+	* kpwmlib
+* pwm - programs and experiments for position weight matrix methods
+	* base - standard PWM, strawman
+	* kpwm - k-means PWM (PCA and supporting experiments)
+* nn - multilayer perceptron methods
+	* mlp
+	* cnn
+* xtra 
+	* tree - tree-based method
+	* mdd
+* test - eventually for unit and functional testing
+
+----
+
+Stuff below needs reorganization for the structure above
+
 ## Data ##
 
 The `data` directory contains the following data files
