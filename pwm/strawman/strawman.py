@@ -30,6 +30,7 @@ if __name__ == '__main__':
 	
 	# cross-validation splitting
 	accs = []
+	hs = []
 	for train, test in seqio.cross_validation(seqs, arg.xvalid):
 	
 		# make pwms from seqs
@@ -52,9 +53,11 @@ if __name__ == '__main__':
 				if fscore > tscore: tn += 1
 				else:               fp += 1	
 		acc = (tp + tn) / (tp + tn + fp + fn)
+		h = pwm.entropy(tpwm)
 		accs.append(acc)
-		print(tp, tn, fp, fn, acc)
+		hs.append(h)
+		print(tp, tn, fp, fn, acc, h)
 
-	print(statistics.mean(accs))
+	print(statistics.mean(accs), statistics.mean(hs))
 
 

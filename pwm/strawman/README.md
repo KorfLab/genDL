@@ -1,0 +1,29 @@
+README for strawman directory
+=============================
+
+## Fabricated Data ##
+
++ 2021-01-05
++ Fabricated data files from repository
++ --xvalid 4 (default)
++ --seed 1
+
+Example command line
+
+	python3 strawman.py --file2 ../../data/acc.not.fa.gz --seed 1 --file1 ../../data/acc.ex6.fa.gz 
+
+Results
+
+| file1   | file2   | accuracy | entropy | notes
+|:--------|:--------|:---------|:--------|:--------
+| don.obs | don.not |  0.8263  |  6.2386 |
+| don.ex1 | don.not |  0.8906  |  7.1415 |
+| don.ex2 | don.not |  0.8243  |  6.2073 |
+| acc.obs | acc.not |  0.9152  |  8.5460 |
+| acc.ex3 | acc.not |  0.9980  | 12.0098 | too easy
+| acc.ex4 | acc.not |  0.9112  | 8.48723 |
+| acc.ex5 | acc.not |  0.9916  | 10.9106 | too easy
+| acc.ex6 | acc.not |  0.9072  |  8.0430 |
+
+
+
