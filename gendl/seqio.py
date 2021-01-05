@@ -51,3 +51,12 @@ def random_dna(length):
 		seq.append(random.choice(nts))
 	return ''.join(seq)
 
+def cross_validation(seqs, x):
+	for i in range(x):
+		train = []
+		test = []
+		for j in range(len(seqs)):
+			if j % x == i: test.append(seqs[j])
+			else:          train.append(seqs[j])
+		yield train, test
+
