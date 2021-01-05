@@ -23,11 +23,11 @@ don_ex1 = 'NNNNNNNNNNNNNNNNNNNNGT1.gNNNNNNNNNNNNNNNNN'
 don_ex2 = 'NNNNNNNNNNNNNNNNNNNNGT2.gNNNNNNNNNNNNNNNNN'
 
 acc_not = 'NNNNNNNNNNNNNNNNNNNNAGNNNNNNNNNNNNNNNNNNNN'
-acc_obs = 'NNNNNNNNNNNNNNNytttyAGNNNNNNNNNNNNNNNNNNNN'
-acc_ex3 = 'NNNNNNNNNNNNNNN3....AGNNNNNNNNNNNNNNNNNNNN'
-acc_ex4 = 'NNNNNNNNNNNNNNN4....AGNNNNNNNNNNNNNNNNNNNN'
-acc_ex5 = 'NNNNNNNNNNNNNNN5....AGNNNNNNNNNNNNNNNNNNNN'
-acc_ex6 = 'NNNNNNNNNNNNNNN6....AGNNNNNNNNNNNNNNNNNNNN'
+acc_obs = 'NNNNNNNNNNNNNNNNtttcAGNNNNNNNNNNNNNNNNNNNN'
+acc_ex3 = 'NNNNNNNNNNNNNNNN3...AGNNNNNNNNNNNNNNNNNNNN'
+acc_ex4 = 'NNNNNNNNNNNNNNNN4...AGNNNNNNNNNNNNNNNNNNNN'
+acc_ex5 = 'NNNNNNNNNNNNNNNN5...AGNNNNNNNNNNNNNNNNNNNN'
+acc_ex6 = 'NNNNNNNNNNNNNNNN6...AGNNNNNNNNNNNNNNNNNNNN'
 
 sigs = {
 	'N' : (1, 'ACGT'), # 25% each nucleotide
@@ -43,10 +43,10 @@ sigs = {
 	'y' : (1, 'CCCCCCCCCTTTTTTTTTAG'), # 90% C or T
 	'1' : (2, ['AA', 'GG']),           # perfect proximal linkage
 	'2' : (2, ['aa', 'gg']),           # imperfect proximal linkage
-	'3' : (5, ['CTTTC', 'TTTTT']),     # perfect distal linkage
-	'4' : (5, ['ctttc', 'ttttt']),     # imperfect distal linkage
-	'5' : (5, ['TTTNC', 'NTTTC']),     # perfect 2 modes
-	'6' : (5, ['tttNc', 'Ntttc']),     # imperfect 2 modes
+	'3' : (4, ['TTTC', 'CTTT']),       # perfect distal linkage
+	'4' : (5, ['tttc', 'cttt']),       # imperfect distal linkage
+	'5' : (5, ['TTNC', 'NTTC']),       # perfect 2 modes
+	'6' : (5, ['ttNc', 'Nttc']),       # imperfect 2 modes
 }
 
 def create_file(sig, filename, count):
