@@ -25,12 +25,11 @@ purine, guanine with some mismatches allowed (see code).
 + ex1 - donor sites where the rrg is AAg or GGg (perfect A and G)
 + ex2 - donor sites where the rrg is aag or ggg (as above but imperfect)
 
-The base acceptor concensus is ytttyAG. The AG is produced 100% of the
-time, but the other positions are allow mismatches.
+The base acceptor concensus is tttcAG. The AG is produced 100% of the
+time, but the other positions allow mismatches.
 
-+ ex3 - acceptor sites with CTTTC or TTTTT (perfect)
-+ ex4 - acceptor sites with ctttc or ttttt (imperfect)
-+ ex5 - acceptor sites with TTTNC or NTTTC (perfect, but slides 1 bp)
-+ ex6 - acceptor sites with tttNc or Ntttc (as above, but imperfect)
-
++ ex3 - acceptor sites with TTTC or CTTT (perfect)
++ ex4 - acceptor sites with tttc or cttt (imperfect)
++ ex5 - acceptor sites with TTNC or NTTC (perfect, but slides 1 bp)
++ ex6 - acceptor sites with ttNc or Nttc (as above, but imperfect)
 

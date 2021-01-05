@@ -19,11 +19,11 @@ Results
 | don.obs | don.not |  0.8263  |  6.2386 |
 | don.ex1 | don.not |  0.8906  |  7.1415 |
 | don.ex2 | don.not |  0.8243  |  6.2073 |
-| acc.obs | acc.not |  0.9152  |  8.5460 |
-| acc.ex3 | acc.not |  0.9980  | 12.0098 | too easy
-| acc.ex4 | acc.not |  0.9112  | 8.48723 |
-| acc.ex5 | acc.not |  0.9916  | 10.9106 | too easy
-| acc.ex6 | acc.not |  0.9072  |  8.0430 |
+| acc.obs | acc.not |  0.9175  |  8.5820 |
+| acc.ex3 | acc.not |  0.9922  | 10.0112 | too easy
+| acc.ex4 | acc.not |  0.8894  |  7.3852 |
+| acc.ex5 | acc.not |  0.9685  |  8.9148 | 
+| acc.ex6 | acc.not |  0.8483  |  6.8941 |
 
 
 
