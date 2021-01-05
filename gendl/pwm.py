@@ -1,5 +1,5 @@
 
-def make_pwm(seqs, boost=None):
+def make_pwm(seqs):
 	length = len(seqs[0])
 	
 	# create counts
@@ -10,10 +10,7 @@ def make_pwm(seqs, boost=None):
 		seq = seqs[i]
 		total += 1
 		for i in range(len(seq)):
-			if boost == None:
-				count[i][seq[i]] += 1
-			else:
-				count[i][seq[i]] += boost[i]
+			count[i][seq[i]] += 1
 
 	# create freqs
 	freq = []
@@ -24,7 +21,7 @@ def make_pwm(seqs, boost=None):
 
 	return freq
 
-def score_pwm(seq, pwm):
+def score_pwm(pwm, seq):
 	p = 1
 	for i in range(len(seq)):
 		p *= pwm[i][seq[i]]
