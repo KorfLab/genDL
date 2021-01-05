@@ -1,4 +1,7 @@
 
+import math
+import sys
+
 def make_pwm(seqs):
 	length = len(seqs[0])
 	
@@ -30,3 +33,14 @@ def score_pwm(pwm, seq):
 def display_pwm(pwm):
 	for i in range(len(pwm)):
 		print(f'{str(i)}\t{pwm[i]["A"]:.3f}\t{pwm[i]["C"]:.3f}\t{pwm[i]["G"]:.3f}\t{pwm[i]["T"]:.3f}')
+
+def entropy(pwm):
+	H = 0
+	
+	for i in range(len(pwm)):
+		h = 0
+		for nt in pwm[i]:
+			if pwm[i][nt] != 0: h += pwm[i][nt] * math.log2(pwm[i][nt])
+		H += 2 + h
+
+	return H
