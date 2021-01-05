@@ -38,19 +38,19 @@ examples of how to import gendl libraries.
 
 	import gendl.pwm
 	import gendl.pwm as pwm
-	from gendl.pwm import read_transfac
+	from gendl.pwm import make_pwm
 
 ## Experiment Directories ##
 
 Experiment directories contain a mixture of code, data, and maybe
 figures or other files. Each type of experiment may have several
-flavors. For example, you will find `pwm/base` for standard PWM
+flavors. For example, you will find `pwm/strawman` for standard PWM
 experiments as well as `pwm/kmeans` for the k-means implementation. Each
 sub-experiment should have its own `README.md` to describe its contents
 and intents.
 
 	pwm
-		base
+		strawman
 		kmeans
 
 	nn
