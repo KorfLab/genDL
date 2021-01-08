@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # network node sizes
-my @lay = qw(336 168 84 42);
+my @lay = qw(168); # it doesn't matter that much
 
 # donor experiments
 my $file2 = 'don.not';
