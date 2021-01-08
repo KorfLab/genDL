@@ -120,28 +120,13 @@ def predict(row, model):
 	yhat = yhat.detach().numpy() # retrieve numpy array
 	return yhat
 
-def fasta2onehot(file, label):
-	data = []
-	for name, seq in seqio.read_fasta(file):
-		s = ''
-		for nt in seq:
-			if   nt == 'A': s += '1000'
-			elif nt == 'C': s += '0100'
-			elif nt == 'G': s += '0010'
-			elif nt == 'T': s += '0001'
-			else: raise()
-		s += str(label)
-		data.append(s)
-	return data
-		
-
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--file1', required=True, type=str,
-		metavar='<file>', help='length of sequence')
-	parser.add_argument('--file2', required=True, type=str,
-		metavar='<file>', help='length of sequence')
+		metavar='<file>', help='fasta file of observed')
+	parser.add_argument('--file0', required=True, type=str,
+		metavar='<file>', help='fasta file of not observed')
 	parser.add_argument('--layer2', required=False, type=int, default=168,
 		metavar='<int>', help='layer 2 [%(default)i]')
 	parser.add_argument('--layer3', required=False, type=int, default=168,
@@ -155,8 +140,8 @@ if __name__ == '__main__':
 	if arg.seed: torch.manual_seed(1)
 	
 	## read fasta files and convert to a single one-hot encoded csv
-	s1 = fasta2onehot(arg.file1, 1)
-	s2 = fasta2onehot(arg.file2, 0)
+	s1 = seqio.fasta2onehot(arg.file1, 1)
+	s2 = seqio.fasta2onehot(arg.file0, 0)
 	seqs = s1 + s2
 	random.shuffle(seqs)
 	
@@ -177,7 +162,7 @@ if __name__ == '__main__':
 		accs.append(acc)
 	
 	## finish up
-	print(arg.file1, arg.file2, 168, arg.layer2, arg.layer3, statistics.mean(accs))
+	print(arg.file1, arg.file0, 168, arg.layer2, arg.layer3, statistics.mean(accs))
 	os.remove(csv)
 	
 	

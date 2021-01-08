@@ -14,7 +14,7 @@ Example command line
 
 Results
 
-| file1   | file2   | accuracy | pwm info| notes
+| file1   | file0   | accuracy | pwm info| notes
 |:--------|:--------|:---------|:--------|:--------
 | don.obs | don.not |  0.8263  |  6.2386 |
 | don.ex1 | don.not |  0.8906  |  7.1415 |

@@ -29,6 +29,20 @@ def read_fasta(filename):
 	yield(name, ''.join(seqs))
 	fp.close()
 
+def fasta2onehot(file, label):
+	data = []
+	for name, seq in read_fasta(file):
+		s = ''
+		for nt in seq:
+			if   nt == 'A': s += '1000'
+			elif nt == 'C': s += '0100'
+			elif nt == 'G': s += '0010'
+			elif nt == 'T': s += '0001'
+			else: raise()
+		s += str(label)
+		data.append(s)
+	return data
+
 def read_raw(filename):
 	fp = None
 	if filename == '-':

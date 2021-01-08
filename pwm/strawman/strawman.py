@@ -11,9 +11,9 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(
 		description='Evaluate the performance of simple PWM methods')
 	parser.add_argument('--file1', required=True, type=str,
-		metavar='<file>', help='fasta file')
-	parser.add_argument('--file2', required=True, type=str,
-		metavar='<file>', help='fasta file')
+		metavar='<file>', help='fasta file of observed sites')
+	parser.add_argument('--file0', required=True, type=str,
+		metavar='<file>', help='fasta file of not observed sites')
 	parser.add_argument('--xvalid', required=False, type=int, default=4,
 		metavar='<int>', help='x-fold cross-validation [%(default)s]')
 	parser.add_argument('--seed', required=False, type=int,
@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
 	# read sequences and reformat
 	seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
-	seqs2 = [(0, seq) for name, seq in seqio.read_fasta(arg.file2)]
+	seqs2 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
 	seqs = seqs1 + seqs2
 	random.shuffle(seqs) # just in case for real data
 	
