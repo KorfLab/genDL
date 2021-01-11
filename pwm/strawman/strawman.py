@@ -24,34 +24,34 @@ if __name__ == '__main__':
 
 	# read sequences and reformat
 	seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
-	seqs2 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
-	seqs = seqs1 + seqs2
+	seqs0 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
+	seqs = seqs1 + seqs0
 	random.shuffle(seqs) # just in case for real data
-	
+
 	# cross-validation splitting
 	accs = []
 	hs = []
 	for train, test in seqio.cross_validation(seqs, arg.xvalid):
-	
+
 		# make pwms from seqs
 		trues = [seq for label, seq in train if label == 1]
 		fakes = [seq for label, seq in train if label == 0]
 		tpwm = pwm.make_pwm(trues)
 		fpwm = pwm.make_pwm(fakes)
-		
+
 		# score vs. test set
 		tp, tn, fp, fn = 0, 0, 0, 0
 		for entry in test:
 			label, seq = entry
 			tscore = pwm.score_pwm(tpwm, seq)
 			fscore = pwm.score_pwm(fpwm, seq)
-			
+
 			if label == 1:
 				if tscore > fscore: tp += 1
 				else:               fn += 1
 			else:
 				if fscore > tscore: tn += 1
-				else:               fp += 1	
+				else:               fp += 1
 		acc = (tp + tn) / (tp + tn + fp + fn)
 		h = pwm.entropy(tpwm)
 		accs.append(acc)
@@ -59,5 +59,3 @@ if __name__ == '__main__':
 		print(tp, tn, fp, fn, acc, h)
 
 	print(statistics.mean(accs), statistics.mean(hs))
-
-
