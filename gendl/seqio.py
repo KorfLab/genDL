@@ -3,6 +3,15 @@ import random
 import sys
 
 def read_fasta(filename):
+	"""
+	Function that reads fasta files
+
+	Keyword arguments:
+	filename -- path to the file, type = str 
+
+	Returns sequence name followed by sequences from the imported file
+	"""
+
 	name = None
 	seqs = []
 	
@@ -30,6 +39,15 @@ def read_fasta(filename):
 	fp.close()
 
 def fasta2onehot(file, label):
+	"""
+  	Function that converts sequences stored in fasta format into one-hot encoded data
+  
+  	Keywords:
+  	file -- path to the fasta file containing sequences, type = str
+  	label -- label provided by the use (example: 0, 1, 2, 3 ...), type = int
+  
+  	Returns one-hot encoded sequences
+  	"""
 	data = []
 	for name, seq in read_fasta(file):
 		s = ''
@@ -44,6 +62,14 @@ def fasta2onehot(file, label):
 	return data
 
 def read_raw(filename):
+	"""
+  	Function that returns sequencing data in fasta format
+  
+  	Keywords:
+  	filename -- path to the fasta file containing sequences, type = str
+  
+  	Returns unfiltered names and sequences
+  	"""
 	fp = None
 	if filename == '-':
 		fp = sys.stdin
@@ -59,6 +85,14 @@ def read_raw(filename):
 	fp.close()
 
 def random_dna(length):
+	"""
+  	Function that generates random dna sequences based on desired length (not weighted)
+  
+  	Keywords:
+  	length -- length of generated dna sequence provided by the user, type = int
+  
+  	Returns random dna sequence based on input length, type = str
+  	"""
 	nts = 'ACGT'
 	seq = []
 	for i in range(length):
@@ -66,6 +100,15 @@ def random_dna(length):
 	return ''.join(seq)
 
 def cross_validation(seqs, x):
+	"""
+  	Function that generated train and test set of a provided dataset
+  
+  	Keywords:
+  	seqs -- list of sequences, type = list
+  	x -- number of cross validations, type = int
+  
+  	Returns train and test sets, type = list, list
+  	"""
 	for i in range(x):
 		train = []
 		test = []
