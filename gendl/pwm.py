@@ -4,15 +4,15 @@ import sys
 
 def make_pwm(seqs):
 	"""
-	Function for making position weight matrix 
-	
+	Function for making position weight matrix
+
 	Keyword arguments:
 	seqs -- list of sequences, type = list
-	
+
 	Returns a list of dictionaries with frequencies for each base in a given position, type = list of dicionaries
 	"""
 	length = len(seqs[0])
-	
+
 	# create counts
 	count = []
 	for i in range(length): count.append({'A':0, 'C':0, 'G':0, 'T':0})
@@ -40,7 +40,7 @@ def score_pwm(pwm, seq):
 	pwm -- position weight matrix, type = list of dictionaries
 	  	** for help refer to make_pwm function
 	seq -- a single sequence, type = int
-	  
+
 	Returns a score for the sequence scored against pwm
   	"""
 	p = 1
@@ -51,11 +51,11 @@ def score_pwm(pwm, seq):
 def display_pwm(pwm):
 	"""
   	Function that displays the probability of each nucleotide in a given position of the pwm
-  
+
   	Keyword arguments:
   	pwm -- position weight matrix, type = list of dictionaries
-  	** for help refer to make_pwm function
-    
+  		** for help refer to make_pwm function
+
   	Returns a pwm in a readable format
   	"""
 
@@ -68,13 +68,13 @@ def entropy(pwm):
 
 	Keyword arguments:
 	pwm -- posiiton weight matrix, type = list of dictionaries
-  	** for help refer to make_pwm function
+  		** for help refer to make_pwm function
 
   	Returns an entropy score, type = float
   	"""
 
 	H = 0
-	
+
 	for i in range(len(pwm)):
 		h = 0
 		for nt in pwm[i]:
