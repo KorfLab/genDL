@@ -4,13 +4,15 @@ import sys
 
 def make_pwm(seqs):
 	"""
-	Function for making position weight matrix
-
-	Keyword arguments:
-	seqs -- list of sequences, type = list
-
-	Returns a list of dictionaries with frequencies for each base in a given position, type = list of dicionaries
+	*Function for making position weight matrix* <br/>
+	
+	*Returns a list of dictionaries with frequencies for each base in a given position (list of dicionaries)* <br/>
+	
+	**Parameters:**
+	_______________
+	+ seqs -- list of sequences (list)
 	"""
+	
 	length = len(seqs[0])
 
 	# create counts
@@ -34,14 +36,15 @@ def make_pwm(seqs):
 
 def score_pwm(pwm, seq):
 	"""
-	Function to show scoring against the created position weight matrix
-
-	Keyword arguments:
-	pwm -- position weight matrix, type = list of dictionaries
+	*Function to show scoring against the created position weight matrix* <br/>
+	
+	*Returns a score for the sequence scored against pwm* <br/>
+	
+	**Parameters:**
+	_______________
+	+ pwm -- position weight matrix (list of dictionaries) <br/>
 	  	** for help refer to make_pwm function
-	seq -- a single sequence, type = int
-
-	Returns a score for the sequence scored against pwm
+	+ seq -- a single sequence (int)
   	"""
 	p = 1
 	for i in range(len(seq)):
@@ -50,13 +53,14 @@ def score_pwm(pwm, seq):
 
 def display_pwm(pwm):
 	"""
-  	Function that displays the probability of each nucleotide in a given position of the pwm
+  	*Function that displays the probability of each nucleotide in a given position of the pwm* <br/>
+	
+	*Returns a pwm in a readable format* <br/>
 
-  	Keyword arguments:
-  	pwm -- position weight matrix, type = list of dictionaries
+	**Parameters:**
+	_______________
+  	+ pwm -- position weight matrix (list of dictionaries) <br/>
   		** for help refer to make_pwm function
-
-  	Returns a pwm in a readable format
   	"""
 
 	for i in range(len(pwm)):
@@ -64,13 +68,15 @@ def display_pwm(pwm):
 
 def entropy(pwm):
 	"""
-	Function that shows how the randomness of the chosen base in a given position
+	*Function that shows how the randomness of the chosen base in a given position* <br/>
+  	
+  	*Returns an entropy score (float)* <br/>
 
-	Keyword arguments:
-	pwm -- posiiton weight matrix, type = list of dictionaries
+	**Parameters:**
+	_______________
+
+	+ pwm -- posiiton weight matrix (list of dictionaries) <br/>
   		** for help refer to make_pwm function
-
-  	Returns an entropy score, type = float
   	"""
 
 	H = 0
