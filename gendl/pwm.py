@@ -4,13 +4,16 @@ import sys
 
 def make_pwm(seqs):
 	"""
-	*Function for making position weight matrix* <br/>
-	
-	*Returns a list of dictionaries with frequencies for each base in a given position (list of dicionaries)* <br/>
+	Function for making position weight matrix
 	
 	**Parameters:**
-	_______________
+	
 	+ seqs -- list of sequences (list)
+	
+	**Returns:**
+	
+	+ list of dictionaries containing nucleotide frequencies
+	
 	"""
 	
 	length = len(seqs[0])
