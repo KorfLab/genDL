@@ -6,8 +6,10 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from apyori import apriori
 
 def conv_data(seqs):
+	####RELOCATE TO gendl
 	converting = {'A':1.0, 'C':2.0, 'G':3.0, 'T':4.0}
 
 	df = []
@@ -20,6 +22,18 @@ def conv_data(seqs):
 
 	df = pd.DataFrame(df)
 	return df
+
+def list_position(seqs, start, stop):
+	####RELOCATE TO gendl
+	assert(start <= stop)
+	total = []
+	for seq in seqs:
+		single_seq = []
+		for base_pos in range(len(seq)):
+			single_seq.append(f'{seq[base_pos]}{base_pos+start}')
+		assert(len(single_seq) == stop-start)
+		total.append(single_seq)
+	return total
 
 def sorting(seqs, kmeans, k):
 	sort_by_label = {}
@@ -100,6 +114,19 @@ def pca_kmeans(df, seqs, k):
 	plt.xlabel('Principal Component 1')
 	plt.title(' PC2 vs PC1: a PCA applied to Kmeans Clustering')
 	plt.show()
+
+def appr(conv_seq, min_sup, min_con):
+	seq_rules = apriori(conv_seq, min_support = min_sup, min_confidence = min_con)
+	seq_results = list(seq_rules)
+	support_values = [item[1] for item in seq_results]
+	listRules = [list(seq_results[i][0]) for i in range(0, len(seq_results))]
+
+	apriori_rules = []
+	for rules, value in zip(listRules, support_values):
+		if value < 1.0:
+			apriori_rules.append((rules, value))
+
+	return apriori_rules
 
 
 
