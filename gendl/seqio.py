@@ -4,17 +4,19 @@ import sys
 
 def read_fasta(filename):
 	"""
-	Function that reads fasta files
+	*Function that reads fasta files* <br/>
 
-	Keyword arguments:
-	filename -- path to the file, type = str 
+	*Returns sequence name followed by sequences from the imported file* <br/>
 
-	Returns sequence name followed by sequences from the imported file
+	**Parameters:**
+	_______________
+
+	+ filename -- path to the file (str)
 	"""
 
 	name = None
 	seqs = []
-	
+
 	fp = None
 	if filename == '-':
 		fp = sys.stdin
@@ -40,14 +42,17 @@ def read_fasta(filename):
 
 def fasta2onehot(file, label):
 	"""
-  	Function that converts sequences stored in fasta format into one-hot encoded data
-  
-  	Keywords:
-  	file -- path to the fasta file containing sequences, type = str
-  	label -- label provided by the use (example: 0, 1, 2, 3 ...), type = int
-  
-  	Returns one-hot encoded sequences
-  	"""
+	*Function converts sequences stored in fasta format into one-hot encoded data* <br/>
+
+	*Returns one-hot encoded sequences* <br/>
+
+	**Parameter:**
+	______________
+
+	+ file -- path to the fasta file containing sequences (str)
+	+ label -- label provided by the use (int)
+	"""
+
 	data = []
 	for name, seq in read_fasta(file):
 		s = ''
@@ -63,13 +68,16 @@ def fasta2onehot(file, label):
 
 def read_raw(filename):
 	"""
-  	Function that returns sequencing data in fasta format
-  
-  	Keywords:
-  	filename -- path to the fasta file containing sequences, type = str
-  
-  	Returns unfiltered names and sequences
-  	"""
+	*Function that returns sequencing data in fasta format* <br/>
+
+	*Returns unfiltered names and sequences* <br/>
+
+	**Parameter:**
+	______________
+
+	+ filename -- path to the fasta file containing sequences (str)
+	"""
+
 	fp = None
 	if filename == '-':
 		fp = sys.stdin
@@ -77,22 +85,25 @@ def read_raw(filename):
 		fp = gzip.open(filename, 'rt')
 	else:
 		fp = open(filename)
-		
+
 	for line in fp.readlines():
 		line = line.rstrip()
 		yield(line)
-	
+
 	fp.close()
 
 def random_dna(length):
 	"""
-  	Function that generates random dna sequences based on desired length (not weighted)
-  
-  	Keywords:
-  	length -- length of generated dna sequence provided by the user, type = int
-  
-  	Returns random dna sequence based on input length, type = str
-  	"""
+	*Function that generates random dna sequences based on desired length (not weighted)* <br/>
+
+	*Returns random dna sequence based on input length (str)* <br/>
+
+	**Parameter:**
+	______________
+
+	+ length -- length of generated dna sequence provided by the user (int)
+
+	"""
 	nts = 'ACGT'
 	seq = []
 	for i in range(length):
@@ -101,14 +112,15 @@ def random_dna(length):
 
 def cross_validation(seqs, x):
 	"""
-  	Function that generated train and test set of a provided dataset
-  
-  	Keywords:
-  	seqs -- list of sequences, type = list
-  	x -- number of cross validations, type = int
-  
-  	Returns train and test sets, type = list, list
-  	"""
+	*Function that generated train and test set of a provided dataset* <br/>
+
+	*Returns train and test sets (list), (list)* <br/>
+
+	**Parameter:**
+	______________
+	+ seqs -- list of sequences (list)
+	+ x -- number of cross validations (int)
+	"""
 	for i in range(x):
 		train = []
 		test = []
