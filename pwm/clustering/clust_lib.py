@@ -124,9 +124,43 @@ def appr(seqs, start, stop, min_sup):
 	apriori_rules = []
 	for rules, value in zip(listRules, support_values):
 		if value < 1.0:
-			apriori_rules.append((rules, value))
+			apriori_rules.append([rules, value])
 
 	return apriori_rules
+
+
+def apr_acc(seqs, mrules, nrules):
+	match = {}
+	nmatch = {}
+
+	for i in range(len(seqs)):
+
+		for rule in mrules:
+			if set(rule[0]).issubset(seqs[i]) == True:
+				if i not in match.keys():
+					match[i] = rule[1]
+				if rule[1] > match[i]:
+					match[i] = rule[1]
+
+
+		for rule in nrules:
+			if set(rule[0]).issubset(seqs[i]) == True:
+				#checking if seq in nmatch dict
+				if i not in nmatch.keys():
+					nmatch[i] = rule[1]
+				#deciding which dict will seq belong if both matched
+				if i in match.keys():
+					if match[i] > rule[1]:
+						del nmatch[i]
+					elif rule[1] > match[i]:
+						del match[i]
+				#updating the support value for seq if present
+				if rule[1] not in nmatch:
+					continue
+				elif rule[1] > nmatch[i]:
+					match[i] = rule[1]
+
+	return len(match), len(nmatch)
 
 
 
