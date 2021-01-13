@@ -14,20 +14,23 @@ if __name__ == '__main__':
 		metavar='<file>', help='fasta file0')
 	parser.add_argument('--xvalid', required=False, type=int, default=4,
 		metavar='<int>', help='x-fold cross-validation [%(default)s]')
-	parser.add_argument('--mins1', required=False, type=int, default=0.2,
-		metavar='<int>', help='minimum support parameter for file 1')
-	parser.add_argument('--mincon1', required=False, type=int, default=0.7,
-		metavar='<int>', help='minimum confidence parameter for file 1')
-	parser.add_argument('--mins0', required=False, type=int, default=0.2,
-		metavar='<int>', help='minimum support parameter for file 0')
-	parser.add_argument('--mincon0', required=False, type=int, default=0.5,
-		metavar='<int>', help='minimum confidence parameter for file 0')
+	parser.add_argument('--mins1', required=False, type=float, default=0.8,
+		metavar='<float>', help='minimum support parameter for file 1')
+	parser.add_argument('--mincon1', required=False, type=float, default=0.2,
+		metavar='<float>', help='minimum confidence parameter for file 1')
+	parser.add_argument('--mins0', required=False, type=float, default=0.8,
+		metavar='<float>', help='minimum support parameter for file 0')
+	parser.add_argument('--mincon0', required=False, type=float, default=0.2,
+		metavar='<float>', help='minimum confidence parameter for file 0')
 	parser.add_argument('--start', required=False, type=int, default=0,
 		metavar='<int>', help='start of the analyzed sequence')
 	parser.add_argument('--stop', required=False, type=int, default=42,
 		metavar='<int>', help='end of the parsing ')
 	parser.add_argument('--seed', required=False, type=int,
 		metavar='<int>', help='end of the analyzed sequence')
+	parser.add_argument('--rules', required=False, action='store_true',
+		help='returns rules for files')
+
 
 	arg = parser.parse_args()
 
@@ -48,23 +51,39 @@ if __name__ == '__main__':
 		#extracting trues and fakes out of the train data
 		trues_train = [seq for label, seq in train if label == 1]
 		fakes_train = [seq for label, seq in train if label == 0]
-		#each sequence is converted to the list of lists, where each base is separated and also has a position available
-
-		#performing necessary conversion prior apriori
-		trues_train_apriori = clust_lib.list_position(trues_train, arg.start, arg.stop)
-		fakes_train_apriori = clust_lib.list_position(fakes_train, arg.start, arg.stop)
 
 		#apriori on converted train sets and getting a set of rules
-		trues_rules = clust_lib.appr(trues_train_apriori, arg.mins1, arg.mincon1)
-		fakes_rules = clust_lib.appr(fakes_train_apriori, arg.mins0, arg.mincon0)
+		trues_rules = clust_lib.appr(trues_train, arg.start, arg.stop, arg.mins1)
+		fakes_rules = clust_lib.appr(fakes_train, arg.start, arg.stop, arg.mins0)
+
+		#returns rules
+		if arg.rules:
+			print('Rules for file1')
+			for i in trues_rules:
+				print('Association rule:', i[0],'Support:', i[1])
+			print('Rules for file0')
+			print('\n')
+			for i in fakes_rules:
+				print('Association rule:', i[0], 'Support:', i[1])
+			print('\n')
 
 		#extracting trues and fakes out of test data
 		trues_test = [seq for label, seq in test if label == 1]
 		fakes_test = [seq for label, seq in test if label == 0]
 
-		#kalmagorov-smirnov test = sanity test check? = can use for the rest of clusterings
-		#testing the sequences against those rules
-		#see the accuracy (as I did it)
+		#converting test set to the same format used by apriori
+		trues_test = clust_lib.list_position(trues_test, arg.start, arg.stop)
+		fakes_test = clust_lib.list_position(fakes_test, arg.start, arg.stop)
+
+		#calculating accuracies
+		tp, fn = clust_lib.apr_acc(trues_test, trues_rules, fakes_rules)
+		tn, fp = clust_lib.apr_acc(fakes_test, fakes_rules, trues_rules)
+
+		percentage = (tp+tn)/(tp+tn+fn+fp)
+
+		accs.append(percentage)
+
+	print('Accuracy:', f'{(sum(accs)/len(accs)):.4f}')
 
 
 
