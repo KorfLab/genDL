@@ -23,26 +23,12 @@ def conv_data(seqs):
 	df = pd.DataFrame(df)
 	return df
 
-def list_position(seqs, start, stop):
-	####RELOCATE TO gendl
-	assert(start <= stop)
-	total = []
-	for seq in seqs:
-		single_seq = []
-		for base_pos in range(len(seq)):
-			single_seq.append(f'{seq[base_pos]}{base_pos+start}')
-		assert(len(single_seq) == stop-start)
-		total.append(single_seq)
-	return total
-
 def sorting(seqs, kmeans, k):
 	sort_by_label = {}
 	for label, seq in zip(kmeans.labels_, seqs):
 		if label not in sort_by_label:
 			sort_by_label[label] = []
-			sort_by_label[label].append(seq)
-		else:
-			sort_by_label[label].append(seq)
+		sort_by_label[label].append(seq)
 	assert(len(sort_by_label.keys()) == k)
 
 	return sort_by_label
@@ -115,8 +101,22 @@ def pca_kmeans(df, seqs, k):
 	plt.title(' PC2 vs PC1: a PCA applied to Kmeans Clustering')
 	plt.show()
 
-def appr(conv_seq, min_sup, min_con):
-	seq_rules = apriori(conv_seq, min_support = min_sup, min_confidence = min_con)
+
+def list_position(seqs, start, stop):
+	####RELOCATE TO gendl
+	assert(start <= stop)
+	total = []
+	for seq in seqs:
+		single_seq = []
+		for base_pos in range(len(seq)):
+			single_seq.append(f'{seq[base_pos]}{base_pos+start}')
+		assert(len(single_seq) == stop-start)
+		total.append(single_seq)
+	return total
+
+def appr(seqs, start, stop, min_sup):
+	conv_seqs = list_position(seqs, start, stop)
+	seq_rules = apriori(conv_seqs, min_support = min_sup)
 	seq_results = list(seq_rules)
 	support_values = [item[1] for item in seq_results]
 	listRules = [list(seq_results[i][0]) for i in range(0, len(seq_results))]
