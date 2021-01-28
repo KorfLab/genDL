@@ -12,25 +12,23 @@ def make_pwm(seqs):
 	
 	**Returns:**
 	
-	+ list of dictionaries containing nucleotide frequencies
-	
+	+ a position weight matrix (list of dictionaries)
 	"""
 	
 	length = len(seqs[0])
 
-	# create counts
-	count = []
-	for i in range(length): count.append({'A':0, 'C':0, 'G':0, 'T':0})
+	# create count data structure
+	count = [ {'A':0, 'C':0, 'G':0, 'T':0} for i in range(length) ]
+	
+	# do the counting
 	total = 0
-	for i in range(len(seqs)):
-		seq = seqs[i]
+	for seq in seqs:
 		total += 1
 		for i in range(len(seq)):
 			count[i][seq[i]] += 1
 
 	# create freqs
-	freq = []
-	for i in range(length): freq.append({})
+	freq = [ {} for i in range(length) ]
 	for i in range(length):
 		for c in count[i]:
 			freq[i][c] = count[i][c] / total
