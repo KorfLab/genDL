@@ -18,7 +18,7 @@ def make_wam(seqs, order):
 	
 	**Returns:**
 	
-	+ weight array matrix model
+	+ weight array matrix model (position-context-letter)
 	"""
 	
 	length = len(seqs[0])
@@ -61,6 +61,20 @@ def make_wam(seqs, order):
 
 
 def score_wam(wam, order, seq):
+	"""
+	Function for scoring weight array matrix
+	
+	**Parameters:**
+	
+	+ wam -- weight array matrix (position-context-letter)
+	+ order -- context of Markov model (int)
+	+ seq -- sequence (str)
+	
+	**Returns:**
+	
+	+ weight array matrix model
+	"""
+	
 	p = 1
 	for i in range(order, len(seq)):
 		ctx = seq[i-order:i]
