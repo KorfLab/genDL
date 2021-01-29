@@ -82,7 +82,6 @@ def pca_kmeans(df, seqs, k):
 	plt.ylabel('explained_variance_ratio')
 	plt.xlabel('Principal Components')
 	plt.title('Percentage of Variance (Information) for each by PC')
-	plt.legend(loc='best')
 	plt.show()
 
 	#PCA Analysis
@@ -98,10 +97,10 @@ def pca_kmeans(df, seqs, k):
 	plt.scatter(x_9d[:,0], x_9d[:,1], c = label_color, alpha = 0.5)
 	plt.ylabel('Principal Component 2')
 	plt.xlabel('Principal Component 1')
-	plt.title(' PC2 vs PC1: a PCA applied to Kmeans Clustering')
+	plt.title(' PC2 vs PC1: PCA applied to Kmeans Clustering')
 	plt.show()
 
-
+#used in apriori
 def list_position(seqs, start, stop):
 	####RELOCATE TO gendl
 	assert(start <= stop)
@@ -114,35 +113,75 @@ def list_position(seqs, start, stop):
 		total.append(single_seq)
 	return total
 
+#specific to apriori
 def appr(seqs, start, stop, min_sup):
 	conv_seqs = list_position(seqs, start, stop)
 	seq_rules = apriori(conv_seqs, min_support = min_sup)
 	seq_results = list(seq_rules)
+
 	support_values = [item[1] for item in seq_results]
 	listRules = [list(seq_results[i][0]) for i in range(0, len(seq_results))]
-
 	apriori_rules = []
 	for rules, value in zip(listRules, support_values):
 		if value < 1.0:
 			apriori_rules.append([rules, value])
-
 	return apriori_rules
 
+def appr_check(rules1, rules2):
+	r1_copy = []
+	r2_copy = []
 
+	r1_copy = [i for i in rules1 for j in rules2 if (i[0]!=j[0] and i not in r1_copy)]
+	print(r1_copy)
+	print(len(r1_copy), len(rules1))
+	sys.exit()
+
+	#rules1 = [x for x ]
+
+	print(len(rules2))
+	rules2 = [i for i in i_copy if i not in rules1]
+	print('\n')
+	print(len(rules2))
+
+	sys.exit()
+
+	for i in rules1:
+		print(i[0])
+		print('OYAPYA')
+		sys.exit()
+	'''
+	sys.exit()
+
+	for i in rules1:
+		for j in rules2:
+			if i[0] == j[0]:
+				continue
+			else:
+				i_cop
+	print(i, j)
+	print(i_updated, j_updated)
+	sys.exit()
+	'''
+	print(rules1, rules2)
+
+#specific for apriori
 def apr_acc(seqs, mrules, nrules):
 	match = {}
 	nmatch = {}
 
 	for i in range(len(seqs)):
-
+		#looping through all of the rules that match the rules buit
+		#from test set of the same seqs dataset
 		for rule in mrules:
 			if set(rule[0]).issubset(seqs[i]) == True:
 				if i not in match.keys():
 					match[i] = rule[1]
+					print(match)
+					sys.exit()
 				if rule[1] > match[i]:
 					match[i] = rule[1]
-
-
+		#looping through all of the rules that match the rules buit
+		#from test set of the another seqs dataset
 		for rule in nrules:
 			if set(rule[0]).issubset(seqs[i]) == True:
 				#checking if seq in nmatch dict
@@ -162,9 +201,38 @@ def apr_acc(seqs, mrules, nrules):
 
 	return len(match), len(nmatch)
 
+#specific to kmeans script
+def regroup(labels, seqs):
+	#predicting labels of test data
+	summary = {}
+	for label, test in zip(labels, seqs):
+		if label not in summary:
+			summary[label] = []
+			summary[label].append(test)
+		else:
+			summary[label].append(test)
 
+	#sorting by labels and appending to the total
+	perc = []
+	for label, seqs in summary.items():
+		count = 0
+		for seq in seqs:
+			if seq[0] == 1:
+				count += 1
+		perc.append(count/len(seqs))
+	perc = sorted(perc, reverse = True)
 
+	return perc
 
+#specific to kmeans script
+def outcome(distr, k):
+	total = []
+	for i in range(k):
+		lst = [item[i] for item in distr]
+		lst = f'{sum(lst)/len(lst):.4f}'
+		total.append(lst)
+
+	return (print(', '.join(total)))
 
 
 
