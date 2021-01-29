@@ -3,7 +3,6 @@ import sys
 import random
 import pandas as pd
 from sklearn.cluster import KMeans
-from io import StringIO
 from gendl import pwm, seqio
 from pwm.clustering import clust_lib
 
@@ -27,8 +26,6 @@ if __name__ == '__main__':
 		metavar='<int>', help='end of the analyzed sequence')
 	parser.add_argument('--pca', required=False, action='store_true',
 		help='perform pca on kmeans')
-	parser.add_argument('--pca', required=False, action='store_true',
-		help='perform pca on kmeans training set')
 	arg = parser.parse_args()
 
 	if arg.seed:
@@ -40,30 +37,29 @@ if __name__ == '__main__':
 	seqs = seqs1 + seqs0
 	random.shuffle(seqs)
 
-	percentages = {}
+	distr_train = []
+	distr_test = []
+
 	#splitting data into training and testing
-	i = 0
+
 	for train, test in seqio.cross_validation(seqs, arg.xvalid):
 
 		#extracting trues and fakes out of the train data
-		trues_train = [seq for label, seq in train if label == 1]
-		fakes_train = [seq for label, seq in train if label == 0]
-
-		train_extr = trues_train + fakes_train
-		random.shuffle(train_extr)
+		train_extr = [seq[1] for seq in train]
 
 		#creating a model using kmeans and train_dff
 		traindf = clust_lib.conv_data(train_extr)
 		kmtr = KMeans(arg.k).fit(traindf)
 
+		#regroup seqs to calculate the distribution
+		distr_train.append(clust_lib.regroup(kmtr.labels_, train))
+
 		#pca
 		if arg.pca:
-			clust_lib.pca_kmeans(trues_df, trues_train, arg.k1)
-			clust_lib.pca_kmeans(fakes_df, fakes_train, arg.k0)
+			clust_lib.pca_kmeans(traindf, train_extr, arg.k)
 
 		#converting test data into df format
 		converting = {'A':1.0, 'C':2.0, 'G':3.0, 'T':4.0}
-		distribution = {}
 		test_df = []
 		for label, seq in test:
 			conv_seq = []
@@ -76,37 +72,10 @@ if __name__ == '__main__':
 
 		#running test_df on the kmeans model created with train set
 		test_labels = kmtr.predict(test_df)
+		#regroup seqs to calculate the distribution
+		distr_test.append(clust_lib.regroup(test_labels, test))
 
-		#predicting labels of test data and show the distribution of each file
-		summary = {}
-		for label, test in zip(test_labels, test):
-			if label not in summary:
-				summary[label] = []
-				summary[label].append(test)
-			else:
-				summary[label].append(test)
-
-		for exp_label in summary.keys():
-			if exp_label not in distribution:
-				distribution[exp_label] = {}
-				for obs_label in summary[exp_label]:
-					if obs_label[0] not in distribution[exp_label]:
-						distribution[exp_label][obs_label[0]] = 1
-					else:
-						distribution[exp_label][obs_label[0]] += 1
-			else:
-				for obs_label in summary[exp_label]:
-					if obs_label[0] not in distribution[exp_label]:
-						distribution[exp_label][obs_label[0]] = 1
-					else:
-						distribution[exp_label][obs_label[0]] += 1
-
-		print('x-fold:', i)
-		for label, seq in distribution.items():
-			print('\nKMEANS CLUSTER:', label)
-			for label, num in seq.items():
-				print('actual label:', label, '\t', 'number of seqs place in cluster:', num)
-
-		print('\n')
-		i += 1
-
+	print('Result of K-means clustering TRAIN set: percent of file1 seqs by each cluster')
+	clust_lib.outcome(distr_train, arg.k)
+	print('Result of K-means clustering TEST set: percent of file1 seqs by each cluster')
+	clust_lib.outcome(distr_test, arg.k)
