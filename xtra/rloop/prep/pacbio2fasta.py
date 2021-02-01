@@ -31,7 +31,7 @@ for i, (name, seq) in enumerate(read_fasta('fa.tmp')):
 	(gene, rid, chr, beg, end, strand) = peaks[i]
 	seq = seq.upper()
 	if strand == '-': seq = revcomp_str(seq)
-	print(f'>{gene}-{chr}:{beg}-{end}:{strand}')
+	print(f'>{gene}:{rid}:{chr}:{beg}:{end}:{strand}')
 	for i in range(0, len(seq), 60):
 		print(seq[i:i+60])
 

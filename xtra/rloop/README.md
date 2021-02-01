@@ -31,7 +31,7 @@ The data output of the program streams json to stdout. The output
 directory contains the original rlooper outputs, which you don't need
 unless you want to do some error checking. 
 
-## The build directory ##
+## The prep directory ##
 
 There are two kinds of data for the R-loop project
 
@@ -41,9 +41,10 @@ There are two kinds of data for the R-loop project
 Data preparation requires the human genome file in 2bit format as well
 as a program to decode/retrieve sequences, and a bigwig decoder.
 `hg19.2bit`, `twoBitToFa`, and `bigWigToWig` can be downloaded from the
-UCSC genome site. Note that if you are on a Mac and you download a
-binary, you won't have permission to run it unless you remove the
-security protection.
+UCSC genome site. Soft-link all of these to the prep directory.
+
+Note that if you are on a Mac and you download a binary, you won't have
+permission to run it unless you remove the security protection.
 
 	xattr -c twoBitToFa bigWigToWig
 	
@@ -52,9 +53,18 @@ security protection.
 PEAKS_GENOME is a directory of R-loops inferred from bisulfite PacBio
 reads. There are 30 genes with multiple reads per gene.
 
-To conver the original data to fasta:
+To convert the original data to fasta:
 
 	pacbio2fasta.py > peaks.fa
+
+The format of the fasta headers is the following
+
+	+ gene
+	+ read identifier (from original data)
+	+ chromosome
+	+ begin
+	+ end
+	+ strand
 
 ### DRIPc, sDRIP, and qDRIP data ##
 

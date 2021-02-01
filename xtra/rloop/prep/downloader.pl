@@ -47,11 +47,15 @@ https://s3-us-west-1.amazonaws.com/muhucsc/K562_DRIPc_WT_LS60B_rep2_pos.bw
 foreach my $url (@url) {
 	my @f = split('/', $url);
 	my $file = $f[4];
-	if (-s "BIGWIG/$file") {
-		print "skipping $file\n"
-	} else {
-		system("wget $url");
-		system("mv $file BIGWIG")
+	if (-s "BIGWIG/$file.wig.gz") {
+		print "skipping $file\n";
+		next;
 	}
-	
+	system("wget $url");
+	system("bigWigToWig $file $file.wig");
+	system("gzip $file.wig");
+	system("mv $file.wig.gz BIGWIG");
+	unlink $file;
 }
+
+
