@@ -1,0 +1,41 @@
+Cell	Experiment	Treatment	SampleID	Replicate	Strand	FirstAuth	LastAuth	YearPublished	bigWigLink	Notes
+HeLa	qDRIP	INPUT	GSE134084	1	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_INPUT_rep1_neg.bw	
+HeLa	qDRIP	INPUT	GSE134084	1	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_INPUT_rep1_pos.bw	
+HeLa	qDRIP	INPUT	GSE134084	3	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_INPUT_rep3_neg.bw	
+HeLa	qDRIP	INPUT	GSE134084	3	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_INPUT_rep3_pos.bw	
+HeLa	qDRIP	INPUT	GSE134084	4	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_INPUT_rep4_neg.bw	
+HeLa	qDRIP	INPUT	GSE134084	4	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_INPUT_rep4_pos.bw	
+HeLa	qDRIP	RNaseH	GSE134084	0	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_RNaseH_neg.bw	
+HeLa	qDRIP	RNaseH	GSE134084	0	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_RNaseH_pos.bw	
+HeLa	qDRIP	WT	GSE134084	1	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep1_neg.bw	
+HeLa	qDRIP	WT	GSE134084	1	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep1_pos.bw	
+HeLa	qDRIP	WT	GSE134084	2	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep2_neg.bw	
+HeLa	qDRIP	WT	GSE134084	2	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep2_pos.bw	
+HeLa	qDRIP	WT	GSE134084	3	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep3_neg.bw	
+HeLa	qDRIP	WT	GSE134084	3	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep3_pos.bw	
+HeLa	qDRIP	WT	GSE134084	4	-	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep4_neg.bw	
+HeLa	qDRIP	WT	GSE134084	4	+	Crossley	KCimprich	2020	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_qDRIP_WT_rep4_pos.bw	
+NT2	sDRIP	RNaseH	LS78	1	-	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_RNaseH_LS78D_neg.bw	preprint
+NT2	sDRIP	RNaseH	LS78	1	+	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_RNaseH_LS78D_pos.bw	preprint
+NT2	sDRIP	WT	LS78	1	-	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_LS78A_rep1_neg.bw	preprint
+NT2	sDRIP	WT	LS78	1	-	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_LS78B_rep2_neg.bw	preprint
+NT2	sDRIP	WT	LS78	1	+	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_LS78A_rep1_pos.bw	preprint
+NT2	sDRIP	WT	LS78	1	+	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_LS78B_rep2_pos.bw	preprint
+NT2	sDRIP	WT	NV1LS	1	-	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_NV1LS1_rep1_neg.bw	preprint
+NT2	sDRIP	WT	NV1LS	1	+	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_NV1LS1_rep1_pos.bw	preprint
+NT2	sDRIP	WT	NV1LS	2	-	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_NV1LS2_rep2_neg.bw	preprint
+NT2	sDRIP	WT	NV1LS	2	+	Smolka	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_sDRIP_WT_NV1LS2_rep2_pos.bw	preprint
+NT2	DRIPc	WT	SX011	1	-	Sanz	FChedin	2016	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_DRIPc_WT_SX011C_rep1_neg.bw	
+NT2	DRIPc	WT	SX011	1	+	Sanz	FChedin	2016	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_DRIPc_WT_SX011C_rep1_pos.bw	
+NT2	DRIPc	WT	SX011	2	-	Sanz	FChedin	2016	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_DRIPc_WT_SX011D_rep2_neg.bw	
+NT2	DRIPc	WT	SX011	2	+	Sanz	FChedin	2016	https://s3-us-west-1.amazonaws.com/muhucsc/NT2_DRIPc_WT_SX011D_rep2_pos.bw	
+HeLa	DRIPc	WT	LS61	1	-	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_DRIPc_WT_LS61A_rep1_neg.bw	
+HeLa	DRIPc	WT	LS61	1	+	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_DRIPc_WT_LS61A_rep1_pos.bw	
+HeLa	DRIPc	WT	LS61	2	-	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_DRIPc_WT_LS61C_rep2_neg.bw	
+HeLa	DRIPc	WT	LS61	2	+	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_DRIPc_WT_LS61C_rep2_pos.bw	
+HeLa	DRIPc	WT	LS61	3	-	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_DRIPc_WT_LS61H_rep3_neg.bw	
+HeLa	DRIPc	WT	LS61	3	+	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/HeLa_DRIPc_WT_LS61H_rep3_pos.bw	
+K562	DRIPc	WT	LS60	1	-	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/K562_DRIPc_WT_LS60A_rep1_neg.bw	
+K562	DRIPc	WT	LS60	1	+	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/K562_DRIPc_WT_LS60A_rep1_pos.bw	
+K562	DRIPc	WT	LS60	2	-	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/K562_DRIPc_WT_LS60B_rep2_neg.bw	
+K562	DRIPc	WT	LS60	2	+	Chedin	FChedin	2021	https://s3-us-west-1.amazonaws.com/muhucsc/K562_DRIPc_WT_LS60B_rep2_pos.bw	
