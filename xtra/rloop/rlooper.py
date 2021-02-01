@@ -12,8 +12,8 @@ if __name__ == '__main__':
 		description='Wrapper for running rlooper')
 	parser.add_argument('--fasta', required=True, type=str,
 		metavar='<file>', help='input file in fasta format')
-	parser.add_argument('--out', required=True, type=str,
-		metavar='<file>', help='output directory')
+	parser.add_argument('--out', required=False, type=str, default='tmp',
+		metavar='<file>', help='output directory [%(default)s]')
 	parser.add_argument('--n', required=False, type=str, default='1500',
 		metavar='<str/int>', help='size of superhelical domain [%(default)s]')
 	parser.add_argument('--s', required=False, type=float, default=-0.07,
