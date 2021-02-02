@@ -121,13 +121,14 @@ def appr(seqs, start, stop, min_sup):
 
 	support_values = [item[1] for item in seq_results]
 	listRules = [list(seq_results[i][0]) for i in range(0, len(seq_results))]
-	apriori_rules = []
+	assoc_rules = []
 	for rules, value in zip(listRules, support_values):
 		if value < 1.0:
-			apriori_rules.append([rules, value])
-	return apriori_rules
+			assoc_rules.append([tuple(rules), value])
+	return assoc_rules
 
 def appr_check(rules1, rules2):
+	#delete it
 	r1_copy = []
 	r2_copy = []
 
@@ -144,13 +145,7 @@ def appr_check(rules1, rules2):
 	print(len(rules2))
 
 	sys.exit()
-
-	for i in rules1:
-		print(i[0])
-		print('OYAPYA')
-		sys.exit()
 	'''
-	sys.exit()
 
 	for i in rules1:
 		for j in rules2:
