@@ -25,7 +25,7 @@ from torch.nn import BCELoss
 from torch.nn.init import kaiming_uniform_
 from torch.nn.init import xavier_uniform_
 
-from gendl import seqio
+from gendl.seqio import fasta2binary
 
 class CSVDataset(Dataset):
 
@@ -119,20 +119,6 @@ def predict(row, model):
 	yhat = model(row) # make prediction
 	yhat = yhat.detach().numpy() # retrieve numpy array
 	return yhat
-
-def fasta2binary(file, label):
-	data = []
-	for name, seq in seqio.read_fasta(file):
-		s = ''
-		for nt in seq:
-			if   nt == 'A': s += '00'
-			elif nt == 'C': s += '01'
-			elif nt == 'G': s += '10'
-			elif nt == 'T': s += '11'
-			else: raise()
-		s += str(label)
-		data.append(s)
-	return data
 
 if __name__ == '__main__':
 

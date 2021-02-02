@@ -103,7 +103,7 @@ def fasta2binary(file, label):
 	"""
 
 	data = []
-	for name, seq in seqio.read_fasta(file):
+	for name, seq in read_fasta(file):
 		s = ''
 		for nt in seq:
 			if   nt == 'A': s += '00'
