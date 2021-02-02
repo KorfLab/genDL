@@ -41,14 +41,6 @@ def read_fasta(filename):
 	name = None
 	seqs = []
 
-	fp = None
-	if filename == '-':
-		fp = sys.stdin
-	elif filename.endswith('.gz'):
-		fp = gzip.open(filename, 'rt')
-	else:
-		fp = open(filename)
-
 	for line in linereader(filename):
 		if line.startswith('>'):
 			if len(seqs) > 0:
@@ -61,7 +53,6 @@ def read_fasta(filename):
 		else:
 			seqs.append(line)
 	yield(name, ''.join(seqs))
-	fp.close()
 
 def fasta2onehot(file, label):
 	"""
@@ -125,8 +116,8 @@ def random_dna(length):
 	______________
 
 	+ length -- length of generated dna sequence provided by the user (int)
-
 	"""
+	
 	nts = 'ACGT'
 	seq = []
 	for i in range(length):
@@ -144,6 +135,7 @@ def cross_validation(seqs, x):
 	+ seqs -- list of sequences (list)
 	+ x -- number of cross validations (int)
 	"""
+	
 	for i in range(x):
 		train = []
 		test = []
