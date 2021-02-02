@@ -2,11 +2,35 @@ import gzip
 import random
 import sys
 
+def linereader(filename):
+	"""
+	*Generator that returns files line by line with minimal memory*
+	
+	Removes line endings also.
+
+	**Parameters:**
+	_______________
+
+	+ filename -- path to the file (str)
+	"""
+	
+	fp = None
+	if   filename == '-':          fp = sys.stdin
+	elif filename.endswith('.gz'): fp = gzip.open(filename, 'rt')
+	else:                          fp = open(filename)
+	
+	while True:
+		line = fp.readline()
+		if line == '': break
+		else: yield line.rstrip()
+	
+	fp.close()
+	
 def read_fasta(filename):
 	"""
-	*Function that reads fasta files* <br/>
+	*Generator that returns records from a fasta file*
 
-	*Returns sequence name followed by sequences from the imported file* <br/>
+	*Returns a tuple of (name, seq)*
 
 	**Parameters:**
 	_______________
@@ -25,8 +49,7 @@ def read_fasta(filename):
 	else:
 		fp = open(filename)
 
-	for line in fp.readlines():
-		line = line.rstrip()
+	for line in linereader(filename):
 		if line.startswith('>'):
 			if len(seqs) > 0:
 				seq = ''.join(seqs)
@@ -42,15 +65,15 @@ def read_fasta(filename):
 
 def fasta2onehot(file, label):
 	"""
-	*Function converts sequences stored in fasta format into one-hot encoded data* <br/>
+	*Converts sequences stored in fasta format into one-hot encoded data*
 
-	*Returns one-hot encoded sequences* <br/>
+	*Returns one-hot encoded sequences with the label on the end*
 
 	**Parameter:**
 	______________
 
 	+ file -- path to the fasta file containing sequences (str)
-	+ label -- label provided by the use (int)
+	+ label -- label provided by the user (int)
 	"""
 
 	data = []
@@ -66,37 +89,37 @@ def fasta2onehot(file, label):
 		data.append(s)
 	return data
 
-def read_raw(filename):
+def fasta2binary(file, label):
 	"""
-	*Function that returns sequencing data in fasta format* <br/>
+	*Converts sequences stored in fasta format into binary encoded data*
 
-	*Returns unfiltered names and sequences* <br/>
+	*Returns binary encoded sequences with the label on the end*
 
 	**Parameter:**
 	______________
 
-	+ filename -- path to the fasta file containing sequences (str)
+	+ file -- path to the fasta file containing sequences (str)
+	+ label -- label provided by the user (int)
 	"""
 
-	fp = None
-	if filename == '-':
-		fp = sys.stdin
-	elif filename.endswith('.gz'):
-		fp = gzip.open(filename, 'rt')
-	else:
-		fp = open(filename)
-
-	for line in fp.readlines():
-		line = line.rstrip()
-		yield(line)
-
-	fp.close()
+	data = []
+	for name, seq in seqio.read_fasta(file):
+		s = ''
+		for nt in seq:
+			if   nt == 'A': s += '00'
+			elif nt == 'C': s += '01'
+			elif nt == 'G': s += '10'
+			elif nt == 'T': s += '11'
+			else: raise()
+		s += str(label)
+		data.append(s)
+	return data
 
 def random_dna(length):
 	"""
-	*Function that generates random dna sequences based on desired length (not weighted)* <br/>
+	*Function that generates random dna sequences based on desired length (not weighted)*
 
-	*Returns random dna sequence based on input length (str)* <br/>
+	*Returns random dna sequence based on input length (str)*
 
 	**Parameter:**
 	______________
@@ -112,9 +135,9 @@ def random_dna(length):
 
 def cross_validation(seqs, x):
 	"""
-	*Function that generated train and test set of a provided dataset* <br/>
+	*Function that generated train and test set of a provided dataset*
 
-	*Returns train and test sets (list), (list)* <br/>
+	*Returns train and test sets (list), (list)*
 
 	**Parameter:**
 	______________
