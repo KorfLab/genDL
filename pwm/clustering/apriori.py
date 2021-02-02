@@ -4,6 +4,7 @@ import random
 from gendl import seqio, pwm
 from pwm.clustering import clust_lib
 from apyori import apriori
+from string import ascii_letters
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(
@@ -26,6 +27,8 @@ if __name__ == '__main__':
 		metavar='<int>', help='end of the analyzed sequence')
 	parser.add_argument('--rules', required=False, action='store_true',
 		help='returns association rules for files')
+	parser.add_argument('--real', required=False, action='store_true',
+		help='If the data is real "possibly remove it later"')
 	arg = parser.parse_args()
 
 	#probability should be <= 1.0
@@ -35,21 +38,106 @@ if __name__ == '__main__':
 	if arg.seed:
 		random.seed(arg.seed)
 
-	'''
-	seqs1 = [(1, seq[arg.start:arg.stop]) for seq in seqio.read_raw(arg.file1)]
-	seqs0 = [(0, seq[arg.start:arg.stop]) for seq in seqio.read_raw(arg.file0)]
-
-	'''
 	#read sequences and create a dataframe out of them
 	seqs1 = [(1, seq[arg.start:arg.stop]) for name, seq in seqio.read_fasta(arg.file1)]
 	seqs0 = [(0, seq[arg.start:arg.stop]) for name, seq in seqio.read_fasta(arg.file0)]
 	seqs = seqs1 + seqs0
 	random.shuffle(seqs)
 
-	accs = []
+	#ask if there is a better way of doing that
+	def preping_for_pwm(data, rule):
+		match = []
+		nmatch = []
+		for seq in data:
+			if set(rule[0]).issubset(seq) == True:
+				match.append(seq)
+			elif set(rule[0]).issubset(seq) == False:
+				nmatch.append(seq)
+		assert(len(match)+len(nmatch) == len(data))
+
+		updated_match = []
+		for seq in match:
+			old = ''
+			for base in seq:
+				for char in base:
+					if char.isalpha():
+						old += char
+			updated_match.append(old)
+
+		updated_nmatch = []
+		for seq in nmatch:
+			old = ''
+			for base in seq:
+				for char in base:
+					if char.isalpha():
+						old += char
+			updated_nmatch.append(old)
+
+		match = updated_match
+		nmatch = updated_nmatch
+
+		#https://spapas.github.io/2016/04/27/python-nested-list-comprehensions/
+		#match = [''.join(filter(str.isalpha, i)) for i in match]
+		return(match, nmatch)
+
+	def filtering(rules1, rules0):
+		dict_rules1 = {}
+		dict_rules0 = {}
+
+		#converting to dictionary
+		for rule1, value1 in rules1:
+			dict_rules1[rule1] = value1
+		for rule0, value0 in rules0:
+			dict_rules0[rule0] = value0
+		#filtering
+		for rule1, value in rules1:
+			if rule1 in dict_rules0:
+				del dict_rules0[rule1]
+				del dict_rules1[rule1]
+
+		#converting to the original format
+		updated_rules1 = []
+		updated_rules0 = []
+
+		for key1, value1 in dict_rules1.items():
+			updated_rules1.append([key1, value1])
+
+		for key, value in dict_rules0.items():
+			updated_rules0.append([key, value])
+
+		return updated_rules1, updated_rules0
+
+	def acc_appr(train_set, rule):
+		match, nmatch = preping_for_pwm(train_set, rule)
+		mpwm = pwm.make_pwm(match)
+		npwm = pwm.make_pwm(nmatch)
+
+		tp, tn, fp, fn = 0, 0, 0, 0
+
+		for entry in test:
+			label, seq = entry
+
+			mscore = pwm.score_pwm(mpwm, seq)
+			nscore = pwm.score_pwm(npwm, seq)
+
+			if label == 1:
+				if  mscore > nscore:
+					tp += 1
+				else:
+					fn += 1
+			elif label == 0:
+				if nscore > mscore:
+					tn += 1
+				else:
+					fp += 1
+		acc = (tp+tn)/(tp+tn+fp+fn)
+		return (acc)
+
+
+
+	accs = {}
 	#splitting data into training and testing
 	for train, test in seqio.cross_validation(seqs, arg.xvalid):
-
 		#extracting trues and fakes out of the train data
 		trues_train = [seq for label, seq in train if label == 1]
 		fakes_train = [seq for label, seq in train if label == 0]
@@ -58,10 +146,7 @@ if __name__ == '__main__':
 		trues_rules = clust_lib.appr(trues_train, arg.start, arg.stop, arg.mins1)
 		fakes_rules = clust_lib.appr(fakes_train, arg.start, arg.stop, arg.mins0)
 
-		#getting rid of rules present in both subsets
-		clust_lib.appr_check(trues_rules, fakes_rules)
-
-		#returns rules
+		#returns rules if asked
 		if arg.rules:
 			print('Rules for file1')
 			for i in trues_rules:
@@ -71,25 +156,59 @@ if __name__ == '__main__':
 			for i in fakes_rules:
 				print('Association rule:', i[0], 'Support:', i[1])
 			print('\n')
-		sys.exit()
+			break
+
+		#filtering out rules present in both datasets
+		trues_rules, fakes_rules = filtering(trues_rules, fakes_rules)
+		assert(len(trues_rules) > 0)
+
+		#extracting trues and fakes out of test data
+		trues_test = [seq for label, seq in test if label == 1]
+		fakes_test = [seq for label, seq in test if label == 0]
+
+		#preparing training set to later use it for pwm
+		train_for_pwm = [seq for label, seq in train]
+		train_for_pwm = clust_lib.list_position(train_for_pwm, arg.start, arg.stop)
+
+		#creating pwm from the training set and apriori rules
+
+		for rule in trues_rules:
+			acc = acc_appr(train_for_pwm, rule)
+
+			if rule[0] not in accs:
+				accs[rule[0]] = ['file1']
+			accs[rule[0]].append(acc)
+
+		print(fakes_rules)
+		if arg.real:
+			for rule in fakes_rules:
+				f_acc = acc_appr(train_for_pwm, rule)
+
+				if rule[0] not in accs:
+					accs[rule[0]] = ['file0']
+				accs[rule[0]].append(f_acc)
+
+
+	print(accs)
+	#sys.exit()
+
+
+
+'''
+		#building pwm with the seqs
+
 		#extracting trues and fakes out of test data
 		trues_test = [seq for label, seq in test if label == 1]
 		fakes_test = [seq for label, seq in test if label == 0]
 
 		#converting test set to the same format used by apriori
 		trues_test = clust_lib.list_position(trues_test, arg.start, arg.stop)
-		#all possible association rules
-		#pwm (relatable to pwm)
-		#run
 		fakes_test = clust_lib.list_position(fakes_test, arg.start, arg.stop)
 
 		#calculating accuracies
-		#print('file1')
-		#tp, fn = clust_lib.apr_acc(trues_test, trues_rules, fakes_rules)
-		#print('yaaaa', tp, fn, len(trues_test), tp/(len(trues_test)))
-		print('file0')
+
+		tp, fn = clust_lib.apr_acc(trues_test, trues_rules, fakes_rules)
 		tn, fp = clust_lib.apr_acc(fakes_test, fakes_rules, trues_rules)
-		print(tn, fp, len(fakes_test), 'ahahah', tn/len(fakes_test))
 
 		#percentage = (tp+tn)/(tp+tn+fn+fp)
 
@@ -97,12 +216,13 @@ if __name__ == '__main__':
 
 	#print('Accuracy:', f'{(sum(accs)/len(accs)):.4f}')
 
+'''
 
 
-
-
-
-
+#Notes:
+#all possible association rules
+#pwm (relatable to pwm)
+#run
 
 
 
