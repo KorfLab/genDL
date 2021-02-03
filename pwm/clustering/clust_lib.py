@@ -127,74 +127,94 @@ def appr(seqs, start, stop, min_sup):
 			assoc_rules.append([tuple(rules), value])
 	return assoc_rules
 
-def appr_check(rules1, rules2):
-	#delete it
-	r1_copy = []
-	r2_copy = []
+#ask if there is a better way of doing that
+def preping_for_pwm(data, rule):
+	match = []
+	nmatch = []
+	for seq in data:
+		if set(rule[0]).issubset(seq) == True:
+			match.append(seq)
+		elif set(rule[0]).issubset(seq) == False:
+			nmatch.append(seq)
+	assert(len(match)+len(nmatch) == len(data))
 
-	r1_copy = [i for i in rules1 for j in rules2 if (i[0]!=j[0] and i not in r1_copy)]
-	print(r1_copy)
-	print(len(r1_copy), len(rules1))
-	sys.exit()
+	updated_match = []
+	for seq in match:
+		old = ''
+		for base in seq:
+			for char in base:
+				if char.isalpha():
+					old += char
+		updated_match.append(old)
 
-	#rules1 = [x for x ]
+	updated_nmatch = []
+	for seq in nmatch:
+		old = ''
+		for base in seq:
+			for char in base:
+				if char.isalpha():
+					old += char
+		updated_nmatch.append(old)
 
-	print(len(rules2))
-	rules2 = [i for i in i_copy if i not in rules1]
-	print('\n')
-	print(len(rules2))
+	match = updated_match
+	nmatch = updated_nmatch
 
-	sys.exit()
-	'''
+	#https://spapas.github.io/2016/04/27/python-nested-list-comprehensions/
+	#match = [''.join(filter(str.isalpha, i)) for i in match]
+	return(match, nmatch)
 
-	for i in rules1:
-		for j in rules2:
-			if i[0] == j[0]:
-				continue
+def filtering(rules1, rules0):
+	dict_rules1 = {}
+	dict_rules0 = {}
+
+	#converting to dictionary
+	for rule1, value1 in rules1:
+		dict_rules1[rule1] = value1
+	for rule0, value0 in rules0:
+		dict_rules0[rule0] = value0
+	#filtering
+	for rule1, value in rules1:
+		if rule1 in dict_rules0:
+			del dict_rules0[rule1]
+			del dict_rules1[rule1]
+
+	#converting to the original format
+	updated_rules1 = []
+	updated_rules0 = []
+
+	for key1, value1 in dict_rules1.items():
+		updated_rules1.append([key1, value1])
+
+	for key, value in dict_rules0.items():
+		updated_rules0.append([key, value])
+
+	return updated_rules1, updated_rules0
+
+def acc_appr(train_set, rule, test):
+	match, nmatch = preping_for_pwm(train_set, rule)
+	mpwm = pwm.make_pwm(match)
+	npwm = pwm.make_pwm(nmatch)
+
+	tp, tn, fp, fn = 0, 0, 0, 0
+
+	for entry in test:
+		label, seq = entry
+
+		mscore = pwm.score_pwm(mpwm, seq)
+		nscore = pwm.score_pwm(npwm, seq)
+
+		if label == 1:
+			if  mscore > nscore:
+				tp += 1
 			else:
-				i_cop
-	print(i, j)
-	print(i_updated, j_updated)
-	sys.exit()
-	'''
-	print(rules1, rules2)
-
-#specific for apriori
-def apr_acc(seqs, mrules, nrules):
-	match = {}
-	nmatch = {}
-
-	for i in range(len(seqs)):
-		#looping through all of the rules that match the rules buit
-		#from test set of the same seqs dataset
-		for rule in mrules:
-			if set(rule[0]).issubset(seqs[i]) == True:
-				if i not in match.keys():
-					match[i] = rule[1]
-					print(match)
-					sys.exit()
-				if rule[1] > match[i]:
-					match[i] = rule[1]
-		#looping through all of the rules that match the rules buit
-		#from test set of the another seqs dataset
-		for rule in nrules:
-			if set(rule[0]).issubset(seqs[i]) == True:
-				#checking if seq in nmatch dict
-				if i not in nmatch.keys():
-					nmatch[i] = rule[1]
-				#deciding which dict will seq belong if both matched
-				if i in match.keys():
-					if match[i] > rule[1]:
-						del nmatch[i]
-					elif rule[1] > match[i]:
-						del match[i]
-				#updating the support value for seq if present
-				if rule[1] not in nmatch:
-					continue
-				elif rule[1] > nmatch[i]:
-					match[i] = rule[1]
-
-	return len(match), len(nmatch)
+				fn += 1
+		elif label == 0:
+			if nscore > mscore:
+				tn += 1
+			else:
+				fp += 1
+	acc = (tp+tn)/(tp+tn+fp+fn)
+	return (acc)
 
 #specific to kmeans script
 def regroup(labels, seqs):
