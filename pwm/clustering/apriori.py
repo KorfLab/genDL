@@ -44,71 +44,8 @@ if __name__ == '__main__':
 	seqs = seqs1 + seqs0
 	random.shuffle(seqs)
 
-	#ask if there is a better way of doing that
-	def preping_for_pwm(data, rule):
-		match = []
-		nmatch = []
-		for seq in data:
-			if set(rule[0]).issubset(seq) == True:
-				match.append(seq)
-			elif set(rule[0]).issubset(seq) == False:
-				nmatch.append(seq)
-		assert(len(match)+len(nmatch) == len(data))
-
-		updated_match = []
-		for seq in match:
-			old = ''
-			for base in seq:
-				for char in base:
-					if char.isalpha():
-						old += char
-			updated_match.append(old)
-
-		updated_nmatch = []
-		for seq in nmatch:
-			old = ''
-			for base in seq:
-				for char in base:
-					if char.isalpha():
-						old += char
-			updated_nmatch.append(old)
-
-		match = updated_match
-		nmatch = updated_nmatch
-
-		#https://spapas.github.io/2016/04/27/python-nested-list-comprehensions/
-		#match = [''.join(filter(str.isalpha, i)) for i in match]
-		return(match, nmatch)
-
-	def filtering(rules1, rules0):
-		dict_rules1 = {}
-		dict_rules0 = {}
-
-		#converting to dictionary
-		for rule1, value1 in rules1:
-			dict_rules1[rule1] = value1
-		for rule0, value0 in rules0:
-			dict_rules0[rule0] = value0
-		#filtering
-		for rule1, value in rules1:
-			if rule1 in dict_rules0:
-				del dict_rules0[rule1]
-				del dict_rules1[rule1]
-
-		#converting to the original format
-		updated_rules1 = []
-		updated_rules0 = []
-
-		for key1, value1 in dict_rules1.items():
-			updated_rules1.append([key1, value1])
-
-		for key, value in dict_rules0.items():
-			updated_rules0.append([key, value])
-
-		return updated_rules1, updated_rules0
-
 	def acc_appr(train_set, rule):
-		match, nmatch = preping_for_pwm(train_set, rule)
+		match, nmatch = clust_lib.preping_for_pwm(train_set, rule)
 		mpwm = pwm.make_pwm(match)
 		npwm = pwm.make_pwm(nmatch)
 
@@ -159,7 +96,7 @@ if __name__ == '__main__':
 			break
 
 		#filtering out rules present in both datasets
-		trues_rules, fakes_rules = filtering(trues_rules, fakes_rules)
+		trues_rules, fakes_rules = clust_lib.filtering(trues_rules, fakes_rules)
 		assert(len(trues_rules) > 0)
 
 		#extracting trues and fakes out of test data
@@ -173,56 +110,28 @@ if __name__ == '__main__':
 		#creating pwm from the training set and apriori rules
 
 		for rule in trues_rules:
-			acc = acc_appr(train_for_pwm, rule)
+			acc = clust_lib.acc_appr(train_for_pwm, rule, test)
 
 			if rule[0] not in accs:
-				accs[rule[0]] = ['file1']
+				accs[rule[0]] = [] #['file1']
 			accs[rule[0]].append(acc)
 
-		print(fakes_rules)
 		if arg.real:
 			for rule in fakes_rules:
-				f_acc = acc_appr(train_for_pwm, rule)
+				f_acc = clust_lib.acc_appr(train_for_pwm, rule, test)
 
 				if rule[0] not in accs:
-					accs[rule[0]] = ['file0']
+					accs[rule[0]] = [] #['file0']
 				accs[rule[0]].append(f_acc)
 
+	if not arg.rules:
+		avg_accs = {}
+		for rule, value in accs.items():
+			avg_accs[rule] = sum(value)/len(value)
+		avg_accs = dict(sorted(avg_accs.items(), key=lambda item: item[1]))
 
-	print(accs)
-	#sys.exit()
-
-
-
-'''
-		#building pwm with the seqs
-
-		#extracting trues and fakes out of test data
-		trues_test = [seq for label, seq in test if label == 1]
-		fakes_test = [seq for label, seq in test if label == 0]
-
-		#converting test set to the same format used by apriori
-		trues_test = clust_lib.list_position(trues_test, arg.start, arg.stop)
-		fakes_test = clust_lib.list_position(fakes_test, arg.start, arg.stop)
-
-		#calculating accuracies
-
-		tp, fn = clust_lib.apr_acc(trues_test, trues_rules, fakes_rules)
-		tn, fp = clust_lib.apr_acc(fakes_test, fakes_rules, trues_rules)
-
-		#percentage = (tp+tn)/(tp+tn+fn+fp)
-
-		#accs.append(percentage)
-
-	#print('Accuracy:', f'{(sum(accs)/len(accs)):.4f}')
-
-'''
-
-
-#Notes:
-#all possible association rules
-#pwm (relatable to pwm)
-#run
+		for key, value in avg_accs.items():
+			print(key, value)
 
 
 
