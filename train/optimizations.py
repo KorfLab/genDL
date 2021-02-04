@@ -109,10 +109,13 @@ for l in layers:
 		results[counter]['PPV'] = ppv
 		results[counter]['NPV'] = npv
 		results[counter]['FSC'] = (2.0*tpr*ppv)/(tpr+ppv)
+		
+#		saving[counter] = (model, model.fsc)
 
 t1 = time.perf_counter()
 totaltime = round(t1-t0,4)
 
+#update send saving to results.txt
 
 print()
 print(eval.summary(results, totaltime))

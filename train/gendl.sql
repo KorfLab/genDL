@@ -7,10 +7,13 @@ CREATE TABLE models (
 	epoch INTEGER,
 	reg TEXT,
 	dropout TEXT,
+	model_h5 BLOB,
+	data_id INTEGER
 );
 
 CREATE TABLE metrics (
 	model_id INTEGER,
+	data_id INTEGER,
 	tpr REAL,
 	tnr REAL,
 	ppv REAL,
@@ -20,11 +23,14 @@ CREATE TABLE metrics (
 );
 
 CREATE TABLE data (
-	model_id INTEGER,
+	data_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	type TEXT,
 	level TEXT,
 	number INTEGER,
 	true_name TEXT,
 	fake_name TEXT,
-	FOREIGN KEY ([model_id]) REFERENCES "models" ([model_id]) ON DELETE ACTION ON UPDATE NO ACTION
+);
+
+CREATE TABLE seq_features (
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 );

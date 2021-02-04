@@ -12,7 +12,7 @@ def performance_metrics(model, vx, vy):
 	
 	print(f'f1: {f1:.4f} recall: {recall:.4f} precision: {precision:.4f}')
 	
-	return recall, preciTysion, f1
+	return recall, precision, f1
 	
 def summary_metrics(results):
 	table = ""

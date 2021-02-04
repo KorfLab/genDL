@@ -67,7 +67,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=5e-5),
 model.summary()
 
 
-model.fit(X, y, epochs=5, batch_size=1000, 
+model.fit(X, y, epochs=20, batch_size=1000, 
 	validation_data=(xv, yv),verbose=2)
 	
 loss,acc,tp,fn,tn,fp = model.evaluate(xv, yv, batch_size=1)
