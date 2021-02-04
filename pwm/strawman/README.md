@@ -10,7 +10,7 @@ README for strawman directory
 
 Example command line
 
-	python3 strawman.py --file2 ../../data/acc.not.fa.gz --seed 1 --file1 ../../data/acc.ex6.fa.gz 
+	python3 strawman.py --file0 ../../data/acc.not.fa.gz --seed 1 --file1 ../../data/acc.ex6.fa.gz
 
 Results
 
@@ -22,7 +22,7 @@ Results
 | acc.obs | acc.not |  0.9175  |  8.5820 |
 | acc.ex3 | acc.not |  0.9922  | 10.0112 | too easy
 | acc.ex4 | acc.not |  0.8894  |  7.3852 |
-| acc.ex5 | acc.not |  0.9685  |  8.9148 | 
+| acc.ex5 | acc.not |  0.9685  |  8.9148 |
 | acc.ex6 | acc.not |  0.8483  |  6.8941 |
 
 
