@@ -139,28 +139,23 @@ def preping_for_pwm(data, rule):
 	assert(len(match)+len(nmatch) == len(data))
 
 	updated_match = []
+
 	for seq in match:
-		old = ''
+		seq_conv = []
 		for base in seq:
-			for char in base:
-				if char.isalpha():
-					old += char
-		updated_match.append(old)
+			seq_conv.append(base[0])
+		updated_match.append(''.join(seq_conv))
 
 	updated_nmatch = []
 	for seq in nmatch:
-		old = ''
+		seq_conv = []
 		for base in seq:
-			for char in base:
-				if char.isalpha():
-					old += char
-		updated_nmatch.append(old)
+			seq_conv.append(base[0])
+		updated_nmatch.append(''.join(seq_conv))
 
 	match = updated_match
 	nmatch = updated_nmatch
 
-	#https://spapas.github.io/2016/04/27/python-nested-list-comprehensions/
-	#match = [''.join(filter(str.isalpha, i)) for i in match]
 	return(match, nmatch)
 
 def filtering(rules1, rules0):
@@ -190,7 +185,7 @@ def filtering(rules1, rules0):
 
 	return updated_rules1, updated_rules0
 
-def acc_appr(train_set, rule, test):
+def acc_appr(train_set, rule, test, x):
 	match, nmatch = preping_for_pwm(train_set, rule)
 	mpwm = pwm.make_pwm(match)
 	npwm = pwm.make_pwm(nmatch)
@@ -203,16 +198,30 @@ def acc_appr(train_set, rule, test):
 		mscore = pwm.score_pwm(mpwm, seq)
 		nscore = pwm.score_pwm(npwm, seq)
 
-		if label == 1:
-			if  mscore > nscore:
-				tp += 1
-			else:
-				fn += 1
-		elif label == 0:
-			if nscore > mscore:
-				tn += 1
-			else:
-				fp += 1
+		#print(train_set.name)
+		#sys.exit()
+		if x == 't':
+			if label == 1:
+				if  mscore > nscore:
+					tp += 1
+				else:
+					fn += 1
+			elif label == 0:
+				if nscore > mscore:
+					tn += 1
+				else:
+					fp += 1
+		elif x == 'f':
+			if label == 1:
+				if  mscore > nscore:
+					fn += 1
+				else:
+					tp += 1
+			elif label == 0:
+				if nscore > mscore:
+					fp += 1
+				else:
+					tn += 1
 	acc = (tp+tn)/(tp+tn+fp+fn)
 	return (acc)
 
