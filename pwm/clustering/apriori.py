@@ -44,34 +44,6 @@ if __name__ == '__main__':
 	seqs = seqs1 + seqs0
 	random.shuffle(seqs)
 
-	def acc_appr(train_set, rule):
-		match, nmatch = clust_lib.preping_for_pwm(train_set, rule)
-		mpwm = pwm.make_pwm(match)
-		npwm = pwm.make_pwm(nmatch)
-
-		tp, tn, fp, fn = 0, 0, 0, 0
-
-		for entry in test:
-			label, seq = entry
-
-			mscore = pwm.score_pwm(mpwm, seq)
-			nscore = pwm.score_pwm(npwm, seq)
-
-			if label == 1:
-				if  mscore > nscore:
-					tp += 1
-				else:
-					fn += 1
-			elif label == 0:
-				if nscore > mscore:
-					tn += 1
-				else:
-					fp += 1
-		acc = (tp+tn)/(tp+tn+fp+fn)
-		return (acc)
-
-
-
 	accs = {}
 	#splitting data into training and testing
 	for train, test in seqio.cross_validation(seqs, arg.xvalid):
@@ -97,20 +69,22 @@ if __name__ == '__main__':
 
 		#filtering out rules present in both datasets
 		trues_rules, fakes_rules = clust_lib.filtering(trues_rules, fakes_rules)
-		assert(len(trues_rules) > 0)
+		#assert(len(trues_rules) > 0)
 
 		#extracting trues and fakes out of test data
 		trues_test = [seq for label, seq in test if label == 1]
 		fakes_test = [seq for label, seq in test if label == 0]
 
 		#preparing training set to later use it for pwm
-		train_for_pwm = [seq for label, seq in train]
-		train_for_pwm = clust_lib.list_position(train_for_pwm, arg.start, arg.stop)
+		true_train_for_pwm = [seq for label, seq in train if label == 1]
+		fake_train_for_pwm = [seq for label, seq in train if label == 0]
+
+		true_train_for_pwm = clust_lib.list_position(true_train_for_pwm, arg.start, arg.stop)
+		fake_train_for_pwm = clust_lib.list_position(fake_train_for_pwm, arg.start, arg.stop)
 
 		#creating pwm from the training set and apriori rules
-
 		for rule in trues_rules:
-			acc = clust_lib.acc_appr(train_for_pwm, rule, test)
+			acc = clust_lib.acc_appr(true_train_for_pwm, rule, test, 't')
 
 			if rule[0] not in accs:
 				accs[rule[0]] = [] #['file1']
@@ -118,7 +92,7 @@ if __name__ == '__main__':
 
 		if arg.real:
 			for rule in fakes_rules:
-				f_acc = clust_lib.acc_appr(train_for_pwm, rule, test)
+				f_acc = clust_lib.acc_appr(fake_train_for_pwm, rule, test, 'f')
 
 				if rule[0] not in accs:
 					accs[rule[0]] = [] #['file0']
