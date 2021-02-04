@@ -124,17 +124,19 @@ if __name__ == '__main__':
 	X, y, vx, vy = prep.val_split(arg.true, arg.fake, arg.val)
 	
 	model1 = FeedForwardModel(
-		layers=0,sizes=[],reg=[],dropout=[]).build()
+		layers=0,sizes=[],reg=[],dropout=[])
+		#.build()
 	
 	model2 = FeedForwardModel(
-		layers=1,sizes=[84],reg=[0],dropout=[0]).build()
+		layers=1,sizes=[84],reg=[0],dropout=[0])
+		#.build()
 	
-	model1.fit(X, y, epochs=10, batch_size=100)
+	model1.model.fit(X, y, epochs=10, batch_size=100)
 #callbacks=[Metrics(validation=(vx,vy))])
 	
-	r, p, f = eval.performance_metrics(model1, vx, vy)
+	r, p, f = eval.performance_metrics(model1.model, vx, vy)
 	
-	model2.fit(X, y, epochs=10, batch_size=1000)
+	model2.model.fit(X, y, epochs=10, batch_size=1000)
 #callbacks=[Metrics(validation=(vx,vy))])
 	
-	r, p, f = eval.performance_metrics(model2, vx, vy)
+	r, p, f = eval.performance_metrics(model2.model, vx, vy)
