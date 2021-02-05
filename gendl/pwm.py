@@ -21,9 +21,7 @@ def make_pwm(seqs):
 	count = [ {'A':0, 'C':0, 'G':0, 'T':0} for i in range(length) ]
 	
 	# do the counting
-	total = 0
 	for seq in seqs:
-		total += 1
 		for i in range(len(seq)):
 			count[i][seq[i]] += 1
 
@@ -31,7 +29,7 @@ def make_pwm(seqs):
 	freq = [ {} for i in range(length) ]
 	for i in range(length):
 		for c in count[i]:
-			freq[i][c] = count[i][c] / total
+			freq[i][c] = count[i][c] / len(seqs)
 
 	return freq
 
