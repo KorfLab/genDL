@@ -1,11 +1,12 @@
 import gzip
 import random
 import sys
+import pandas as pd
 
 def linereader(filename):
 	"""
 	*Generator that returns files line by line with minimal memory*
-	
+
 	Removes line endings also.
 
 	**Parameters:**
@@ -13,19 +14,19 @@ def linereader(filename):
 
 	+ filename -- path to the file (str)
 	"""
-	
+
 	fp = None
 	if   filename == '-':          fp = sys.stdin
 	elif filename.endswith('.gz'): fp = gzip.open(filename, 'rt')
 	else:                          fp = open(filename)
-	
+
 	while True:
 		line = fp.readline()
 		if line == '': break
 		else: yield line.rstrip()
-	
+
 	fp.close()
-	
+
 def read_fasta(filename):
 	"""
 	*Generator that returns records from a fasta file*
@@ -117,7 +118,7 @@ def random_dna(length):
 
 	+ length -- length of generated dna sequence provided by the user (int)
 	"""
-	
+
 	nts = 'ACGT'
 	seq = []
 	for i in range(length):
@@ -135,7 +136,7 @@ def cross_validation(seqs, x):
 	+ seqs -- list of sequences (list)
 	+ x -- number of cross validations (int)
 	"""
-	
+
 	for i in range(x):
 		train = []
 		test = []
@@ -143,4 +144,27 @@ def cross_validation(seqs, x):
 			if j % x == i: test.append(seqs[j])
 			else:          train.append(seqs[j])
 		yield train, test
+
+def conv_data(seqs):
+	"""
+	*Function that converts list of seqs into df*
+
+	*Returns dataframe*
+
+	**Parameter:**
+	______________
+	+ seqs -- list of sequences (list)
+	"""
+	converting = {'A':1.0, 'C':2.0, 'G':3.0, 'T':4.0}
+
+	df = []
+	for seq in seqs:
+		conv_seq = []
+		for base in seq:
+			if base in converting:
+				conv_seq.append(converting[base])
+		df.append(conv_seq)
+
+	df = pd.DataFrame(df)
+	return df
 
