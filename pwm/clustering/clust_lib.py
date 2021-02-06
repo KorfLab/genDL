@@ -8,21 +8,6 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from apyori import apriori
 
-def conv_data(seqs):
-	####RELOCATE TO gendl
-	converting = {'A':1.0, 'C':2.0, 'G':3.0, 'T':4.0}
-
-	df = []
-	for seq in seqs:
-		conv_seq = []
-		for base in seq:
-			if base in converting:
-				conv_seq.append(converting[base])
-		df.append(conv_seq)
-
-	df = pd.DataFrame(df)
-	return df
-
 def sorting(seqs, kmeans, k):
 	sort_by_label = {}
 	for label, seq in zip(kmeans.labels_, seqs):
