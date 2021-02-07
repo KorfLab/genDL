@@ -156,15 +156,16 @@ def conv_data(seqs):
 	+ seqs -- list of sequences (list)
 	"""
 	converting = {'A':1.0, 'C':2.0, 'G':3.0, 'T':4.0}
-
 	df = []
 	for seq in seqs:
 		conv_seq = []
 		for base in seq:
+			if base == '0' or base == '1':
+				conv_seq.append(int(base))
 			if base in converting:
 				conv_seq.append(converting[base])
 		df.append(conv_seq)
 
 	df = pd.DataFrame(df)
-	return df
+	return (df)
 
