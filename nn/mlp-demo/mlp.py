@@ -152,18 +152,18 @@ if __name__ == '__main__':
 	if arg.layers[0] != size: raise Exception('input layer != inputs')
 	if arg.layers[-1] != 1: raise Exception('last layer must be 1')
 	
-	# do the deep learning stuff
+	# train, test, evaluate model
 	accs = []
-	for x in range(arg.iter):
+	for i in range(arg.iter):
 		train_dl, test_dl = prepare_data(csv, 0.5)
 		model = MLP(size, arg.layers)
 		train_model(train_dl, model, arg.rate, arg.momentum)
 		acc, f1 = evaluate_model(test_dl, model)
-		sys.stderr.write(f'{x} {size} {arg.layers} {acc:.3f}\n')
+		sys.stderr.write(f'{acc:.3f}\n')
 		accs.append(acc)
 	
-	# finish up
-	arch = [size] + arg.layers + [0]
-	print(arg.file1, arg.file0, arch, statistics.mean(accs))
+	# report aggregate performance
+	print(arg.file1, arg.file0, arg.layers, arg.rate, arg.momentum,
+		statistics.mean(accs))
 	os.remove(csv)
 	
