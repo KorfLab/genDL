@@ -21,5 +21,3 @@ didn't matter that much, so these are all 168->168->168->1.
 | a.ex4 | 0.8547 | 0.8894 | 
 | a.ex5 | 0.9806 | 0.9685 | mlp wins!
 | a.ex6 | 0.8234 | 0.8483 | 
-
-
