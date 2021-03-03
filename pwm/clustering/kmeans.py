@@ -48,7 +48,7 @@ if __name__ == '__main__':
 		train_extr = [seq[1] for seq in train]
 
 		#creating a model using kmeans and train_dff
-		traindf = clust_lib.conv_data(train_extr)
+		traindf = seqio.conv_data(train_extr)
 		kmtr = KMeans(arg.k).fit(traindf)
 
 		#regroup seqs to calculate the distribution
