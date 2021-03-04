@@ -37,12 +37,18 @@ if __name__ == '__main__':
 	if arg.seed:
 		random.seed(arg.seed)
 
-	seqs1 = ['1' + seq for name, seq in seqio.read_fasta(arg.file1)]
-	seqs0 = ['0' + seq for name, seq in seqio.read_fasta(arg.file0)]
+	seqs1 = seqio.fasta2onehot(arg.file1, '1')
+	seqs0 = seqio.fasta2onehot(arg.file0, '0')
 	seqs = seqs1 + seqs0
 	random.shuffle(seqs)
 
+	#as a test, try Conv1D
+
 	#converting data to df
+	#try the bindary encoding as well = depth = 2 and one hot flatten
+	#binary and one hot not flatten
+	#possibly use another fake dataset
+	#try both max pooling and without the maxpooling
 
 	conv_df = seqio.conv_data(seqs)
 	#print(conv_df.shape)
@@ -51,8 +57,9 @@ if __name__ == '__main__':
 
 	#splitting data into train and test sets
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = arg.split)
+	print(X_train)
 	print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
-
+	sys.exit()
 	#creating tensor for train data
 	#print('initial', X_train.shape)
 	torch_X_train = torch.from_numpy(X_train).type(torch.LongTensor)
