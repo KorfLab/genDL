@@ -24,7 +24,9 @@ if __name__ == '__main__':
 	parser.add_argument('--file', required=True, type=str,
 		metavar='<path>', help='path to cvs file (train.csv)')
 	parser.add_argument('--fold', required=False, type=int, default=5,
-		metavar='<int>', help='number of epochs')
+		metavar='<int>', help='cross validation-ish')
+	parser.add_argument('--split', required=False, type=float, default=0.5,
+		metavar='<float>', help='fraction of set')
 	parser.add_argument('--seed', required=False, type=int,
 		metavar='<int>', help='random seed')
 	arg = parser.parse_args()
@@ -36,7 +38,7 @@ if __name__ == '__main__':
 	for i in range(arg.fold):
 		test = []
 		for p in all:
-			if random.random() < 0.5: test.append(p)
+			if random.random() < arg.split: test.append(p)
 		
 		# female model (females survive)
 		tp = 0
@@ -96,7 +98,5 @@ if __name__ == '__main__':
 		acc = (tp + tn) / (tp + tn + fp + fn)
 		print('age', tp, tn, fp, fn, acc)
 		
-		
 		print()
-		
 		
