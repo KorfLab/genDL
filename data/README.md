@@ -35,10 +35,10 @@ time, but the other positions allow mismatches.
 
 ## Exon Data ##
 
-Plan is for 4 files with 50 bp each?
+51 bp each. Generation script is in lyman2020.
 
 1. CDS anchored at ATG
-2. CDS anchored at frame 1
+2. CDS anchored at phase 0
 3. CDS any frame, but + strand
-4. CDS any frame, any strand
+4. CDS any frame, but - strand
 
