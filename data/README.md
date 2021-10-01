@@ -1,7 +1,7 @@
 README for data directory
 =========================
 
-## Fabricated Data ##
+## Fabricated Splice Data ##
 
 The script `fabricate_data.py` creates fabricated splice data.
 
@@ -32,4 +32,13 @@ time, but the other positions allow mismatches.
 + ex4 - acceptor sites with tttc or cttt (imperfect)
 + ex5 - acceptor sites with TTNC or NTTC (perfect, but slides 1 bp)
 + ex6 - acceptor sites with ttNc or Nttc (as above, but imperfect)
+
+## Exon Data ##
+
+Plan is for 4 files with 50 bp each?
+
+1. CDS anchored at ATG
+2. CDS anchored at frame 1
+3. CDS any frame, but + strand
+4. CDS any frame, any strand
 
