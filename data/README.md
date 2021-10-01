@@ -37,8 +37,8 @@ time, but the other positions allow mismatches.
 
 51 bp each. Generation script is in lyman2020.
 
-1. CDS anchored at ATG
-2. CDS anchored at phase 0
-3. CDS any frame, but + strand
-4. CDS any frame, but - strand
+1. CDS anchored at ATG (cdsi.fa.gz)
+2. CDS anchored at phase 0 (cds0.fa.gz)
+3. CDS any frame, but + strand (cds+.fa.gz)
+4. CDS any frame, but - strand (cds-.fa.gz)
 
