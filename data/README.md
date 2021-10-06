@@ -41,4 +41,5 @@ time, but the other positions allow mismatches.
 2. CDS anchored at phase 0 (cds0.fa.gz)
 3. CDS any frame, but + strand (cds+.fa.gz)
 4. CDS any frame, but - strand (cds-.fa.gz)
+5. CDS generated randomly from cds+ (cdsf.fa.gz)
 
