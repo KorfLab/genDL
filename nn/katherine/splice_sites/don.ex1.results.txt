@@ -1,0 +1,13 @@
+don.ex1 Results:
+50 epochs
+==========TRAINING==========
+Loss: 0.08292774856090546
+Training Accuracy: 0.885912299156189
+Precision: 0.8471722602844238
+Recall: 0.9417059421539307
+
+==========TESTING==========
+Loss: 0.08492375165224075
+Testing Accuracy: 0.8828333616256714
+Testing Precision: 0.8456214070320129
+Testing Recall: 0.9366666674613953

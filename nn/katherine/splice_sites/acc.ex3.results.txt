@@ -1,0 +1,14 @@
+acc.ex3 Results:
+800 epochs
+
+==========TRAINING==========
+Loss: 0.009016753174364567
+Accuracy: 0.9918559789657593
+Precision: 0.9839730262756348
+Recall: 1.0
+
+==========TESTING==========
+Loss: 0.008313811384141445
+Accuracy: 0.9928333163261414
+Testing Precision: 0.9858692288398743
+Testing Recall: 1.0

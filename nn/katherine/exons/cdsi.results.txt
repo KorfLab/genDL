@@ -1,0 +1,13 @@
+cdsi Results:
+100 epochs
+==========TRAINING==========
+Loss: 0.0010715711396187544
+Training Accuracy: 0.9989519119262695
+Precision: 0.9937499761581421
+Recall: 1.0
+
+==========TESTING==========
+Loss: 0.01764625310897827
+Testing Accuracy: 0.980435311794281
+Testing Precision: 0.9179415702819824
+Testing Recall: 0.9691630005836487

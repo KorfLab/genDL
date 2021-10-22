@@ -1,0 +1,13 @@
++- Results:
+10 epochs
+==========TRAINING==========
+Loss: 0.0009298456134274602
+Training Accuracy: 1.0
+Precision: 0.0
+Recall: 0.0
+
+==========TESTING==========
+Loss: 0.0009229585411958396
+Testing Accuracy: 1.0
+Testing Precision: 0.0
+Testing Recall: 0.0

@@ -1,0 +1,13 @@
+acc.ex5 Results:
+800 epochs
+==========TRAINING==========
+Loss: 0.02330600470304489
+Training Accuracy: 0.9745677709579468
+Precision: 0.9515975713729858
+Recall: 1.0
+
+==========TESTING==========
+Loss: 0.023791732266545296
+Testing Accuracy: 0.9753333330154419
+Testing Precision: 0.9529860019683838
+Testing Recall: 1.0

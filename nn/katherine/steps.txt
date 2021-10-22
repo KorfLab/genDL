@@ -1,0 +1,10 @@
+1) Binary encoding of data using seqio.py > fasta2binary
+2) Combine true.csv + false.csv using linux cat function
+3) Scramble rows
+4) Trial and error to find optimal layer size (sklearn GridSearch)
+5) Train and evaluate
+
+Need to do:
+Try different numbers of hidden layers
+Try different optimizers and activation functions
+Train/test splitting + cross validation
