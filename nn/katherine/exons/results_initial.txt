@@ -1,0 +1,259 @@
+file1: cds0
+file0: cdsf
+20 epochs
+Results:
+==========TRAINING==========
+Loss: 0.19912226498126984
+Training Accuracy: 0.6954662799835205
+Precision: 0.7318710684776306
+Recall: 0.61690354347229
+
+==========TESTING==========
+Loss: 0.21149292588233948
+Testing Accuracy: 0.6662265062332153
+Testing Precision: 0.7023937106132507
+Testing Recall: 0.5768779516220093
+
+
+
+file1: cds0
+file0: cdsf
+15 epochs
+Results:
+==========TRAINING==========
+Loss: 0.205735445022583
+Training Accuracy: 0.6805633902549744
+Precision: 0.6964017152786255
+Recall: 0.6401710510253906
+
+==========TESTING==========
+Loss: 0.2100265622138977
+Testing Accuracy: 0.6710680723190308
+Testing Precision: 0.6877012252807617
+Testing Recall: 0.6267605423927307
+
+
+file1: cds0
+file0: cdsf
+15 epochs, lr = 0.001
+Results:
+==========TRAINING==========
+Loss: 0.20711295306682587
+Training Accuracy: 0.6791171431541443
+Precision: 0.6667056679725647
+Recall: 0.716423511505127
+F1: 0.6906710130569983
+
+==========TESTING==========
+Loss: 0.21220844984054565
+Testing Accuracy: 0.6674002408981323
+Testing Precision: 0.6572058200836182
+Testing Recall: 0.6998239159584045
+F1: 0.6778456483098464
+
+
+file1: cds0
+file0: cdsf
+15 epochs, lr = 0.01
+Results:
+==========TRAINING==========
+Loss: 0.18035925924777985
+Training Accuracy: 0.7333836555480957
+Precision: 0.7224352955818176
+Recall: 0.7580482959747314
+F1: 0.7398134608057633
+
+==========TESTING==========
+Loss: 0.22133663296699524
+Testing Accuracy: 0.6569835543632507
+Testing Precision: 0.645380437374115
+Testing Recall: 0.6968896985054016
+F1: 0.6701467408097084
+
+
+
+file1: cds+
+file0: cdsf
+20 epochs, lr = 0.001
+Results:
+==========TRAINING==========
+Loss: 0.23772859573364258
+Training Accuracy: 0.5963025689125061
+Precision: 0.6611239910125732
+Recall: 0.3950446546077728
+F1: 0.49456779419743657
+
+==========TESTING==========
+Loss: 0.24607743322849274
+Testing Accuracy: 0.5535504817962646
+Testing Precision: 0.5897688269615173
+Testing Recall: 0.35181924700737
+F1: 0.44072780942396905
+
+
+
+file1: cds+
+file0: cdsf
+15 epochs, lr = 0.001
+Results:
+==========TRAINING==========
+Loss: 0.24460521340370178
+Training Accuracy: 0.5632899403572083
+Precision: 0.6199332475662231
+Recall: 0.3270028829574585
+F1: 0.4281597304418517
+
+==========TESTING==========
+Loss: 0.24898700416088104
+Testing Accuracy: 0.5264084339141846
+Testing Precision: 0.5525087714195251
+Testing Recall: 0.2778755724430084
+F1: 0.36977742240140266
+
+
+
+file1: cds+
+file0: cdsf
+12 epochs
+Results:
+==========TRAINING==========
+Loss: 0.24834580719470978
+Training Accuracy: 0.5386404991149902
+Precision: 0.5450022220611572
+Recall: 0.46830984950065613
+F1: 0.5037538104082763
+
+==========TESTING==========
+Loss: 0.2500588595867157
+Testing Accuracy: 0.5090962648391724
+Testing Precision: 0.5103402137756348
+Testing Recall: 0.4489436745643616
+F1: 0.4776771790608685
+
+
+
+file1: cds+
+file0: cdsf
+3 epochs
+Results:
+==========TRAINING==========
+Loss: 0.24994640052318573
+Training Accuracy: 0.499968558549881
+Precision: 0.499968558549881
+Recall: 1.0
+==========TESTING==========
+Loss: 0.24999399483203888
+Testing Accuracy: 0.5
+Testing Precision: 0.5
+Testing Recall: 1.0
+
+
+
+file1: cds+
+file0: cdsf
+15 epochs, lr = 0.0001
+Results:
+==========TRAINING==========
+Loss: 0.24994394183158875
+Training Accuracy: 0.5267559289932251
+Precision: 0.5382952094078064
+Recall: 0.3756760060787201
+==========TESTING==========
+Loss: 0.24999919533729553
+Testing Accuracy: 0.5041079521179199
+Testing Precision: 0.5056818127632141
+Testing Recall: 0.3656103312969208
+
+
+
+file1: cds+
+file0: cdsf
+10 epochs, lr = 0.0001
+Results:
+==========TRAINING==========
+Loss: 0.24998632073402405
+Training Accuracy: 0.5115386843681335
+Precision: 0.5090729594230652
+Recall: 0.6491448879241943
+==========TESTING==========
+Loss: 0.24999652802944183
+Testing Accuracy: 0.5026408433914185
+Testing Precision: 0.502082347869873
+Testing Recall: 0.6367371082305908
+
+
+
+file1: cds-
+file0: cdsf
+20 epochs, lr = 0.0001
+Results:
+==========TRAINING==========
+Loss: 0.2498130053281784
+Training Accuracy: 0.5548009872436523
+Precision: 0.6882556080818176
+Recall: 0.20045271515846252
+==========TESTING==========
+Loss: 0.24984821677207947
+Testing Accuracy: 0.5536971688270569
+Testing Precision: 0.6790606379508972
+Testing Recall: 0.20363849401474
+
+
+
+file1: cds+
+file0: cds-
+20 epochs, lr = 0.0001
+Results:
+==========TRAINING==========
+Loss: 0.24997572600841522
+Training Accuracy: 0.5044959783554077
+Precision: 0.5022839903831482
+Recall: 0.9955986142158508
+F1: 0.667706859313111
+
+==========TESTING==========
+Loss: 0.24997517466545105
+Testing Accuracy: 0.5044013857841492
+Testing Precision: 0.5022150278091431
+Testing Recall: 0.99794602394104
+F1: 0.6681729132760256
+
+
+
+file1: cds+
+file0: cds-
+20 epochs, lr = 0.001
+Results:
+==========TRAINING==========
+Loss: 0.22615590691566467
+Training Accuracy: 0.6387473940849304
+Precision: 0.6280013918876648
+Recall: 0.6808350086212158
+F1: 0.653351836629444
+
+==========TESTING==========
+Loss: 0.23837269842624664
+Testing Accuracy: 0.5996185541152954
+Testing Precision: 0.5903165936470032
+Testing Recall: 0.6511150002479553
+F1: 0.6192270132467128
+
+
+
+file1: cds-
+file0: cdsf
+20 epochs, lr = 0.001
+Results:
+==========TRAINING==========
+Loss: 0.22168079018592834
+Training Accuracy: 0.6457901000976562
+Precision: 0.7788739204406738
+Recall: 0.4071185886859894
+F1: 0.5347319629997178
+
+==========TESTING==========
+Loss: 0.2422027587890625
+Testing Accuracy: 0.5864143371582031
+Testing Precision: 0.6674246788024902
+Testing Recall: 0.34448355436325073
+F1: 0.454422284725051

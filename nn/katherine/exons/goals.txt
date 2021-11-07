@@ -1,0 +1,15 @@
+Goal: test the effect of different numbers of hidden layers
+Number of hidden layers [0,1,2,3,4,10]
+Layer size - 10 for every hidden layer
+Learning rate (=1e-4)
+Dropout rate (=0.2)
+Regularization (L2) (=1e-4)
+Batch size (keras default, will look into it)
+Activation function - sigmoid, relu, elu, swish
+Loss function - binary_crossentropy
+Optimizer - adam
+    currently using Adam, but maybe adjust parameters
+Momentum
+
+look through pytorch code-- differences/similarities
+which sequences does the nn like best? look at weights / graph weights

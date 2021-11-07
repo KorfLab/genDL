@@ -1,0 +1,292 @@
+file1: cds0
+file0: cdsf
+20 epochs, 0 hidden layers, no reg, no dropout
+Results:
+==========TRAINING==========
+Loss: 0.6254667639732361
+Training Accuracy: 0.6510092616081238
+Precision: 0.652019739151001
+Recall: 0.6475914716720581
+F1: 0.6497980610195214
+
+==========TESTING==========
+Loss: 0.6299430727958679
+Testing Accuracy: 0.6414319276809692
+Testing Precision: 0.6433670520782471
+Testing Recall: 0.6346830725669861
+F1: 0.6389955597629369
+
+
+
+file1: cds0
+file0: cdsf
+20 epochs, 1 hidden layer
+Results:
+==========TRAINING==========
+Loss: 0.6304296851158142
+Training Accuracy: 0.665723443031311
+Precision: 0.6623136401176453
+Recall: 0.6761413812637329
+F1: 0.6691560826553241
+
+==========TESTING==========
+Loss: 0.6337521076202393
+Testing Accuracy: 0.65830397605896
+Testing Precision: 0.6546288132667542
+Testing Recall: 0.670187771320343
+F1: 0.6623169282592627
+
+
+
+file1: cds0
+file0: cdsf
+20 epochs, 2 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.6247671842575073
+Training Accuracy: 0.6691190600395203
+Precision: 0.6728371381759644
+Recall: 0.6582819819450378
+F1: 0.6654799831955518
+
+==========TESTING==========
+Loss: 0.6343457698822021
+Testing Accuracy: 0.6500880122184753
+Testing Precision: 0.6537421345710754
+Testing Recall: 0.6382042169570923
+F1: 0.645879740427743
+
+
+
+file1: cds0
+file0: cdsf
+20 epochs, 3 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.6466387510299683
+Training Accuracy: 0.6692448258399963
+Precision: 0.6592496037483215
+Recall: 0.7005408406257629
+F1: 0.6792682997631044
+
+==========TESTING==========
+Loss: 0.6531994342803955
+Testing Accuracy: 0.6537558436393738
+Testing Precision: 0.6456364393234253
+Testing Recall: 0.6816314458847046
+F1: 0.6631458570744646
+
+
+
+file1: cds0
+file0: cdsf
+20 epochs, 4 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.6246421337127686
+Training Accuracy: 0.6658492088317871
+Precision: 0.6581534743309021
+Recall: 0.6902666091918945
+F1: 0.6738276485283096
+
+==========TESTING==========
+Loss: 0.6289600729942322
+Testing Accuracy: 0.658450722694397
+Testing Precision: 0.6511757969856262
+Testing Recall: 0.6825117468833923
+F1: 0.6664756415727505
+
+
+
+file1: cds0
+file0: cdsf
+20 epochs, 10 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.6931467056274414
+Training Accuracy: 0.5000314116477966
+Precision: 0.5000314116477966
+Recall: 1.0
+F1: 0.6666945875466809
+
+==========TESTING==========
+Loss: 0.6931471824645996
+Testing Accuracy: 0.5
+Testing Precision: 0.5
+Testing Recall: 1.0
+F1: 0.6666666666666666
+
+
+
+file1: cds+
+file0: cdsf
+20 epochs, 0 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.7006584405899048
+Training Accuracy: 0.5098409056663513
+Precision: 0.5100191235542297
+Recall: 0.5025150775909424
+F1: 0.5062392937559099
+
+==========TESTING==========
+Loss: 0.701931893825531
+Testing Accuracy: 0.5089495182037354
+Testing Precision: 0.5091564059257507
+Testing Recall: 0.4976525902748108
+F1: 0.503338776709714
+
+
+
+file1: cds+
+file0: cdsf
+20 epochs, 1 hidden layer
+Results:
+==========TRAINING==========
+Loss: 0.6952869892120361
+Training Accuracy: 0.5307803750038147
+Precision: 0.5303969979286194
+Recall: 0.537600576877594
+F1: 0.5339744935512768
+
+==========TESTING==========
+Loss: 0.6970142722129822
+Testing Accuracy: 0.49281102418899536
+Testing Precision: 0.49297791719436646
+Testing Recall: 0.5046948194503784
+F1: 0.49876756530038213
+
+
+
+file1: cds+
+file0: cdsf
+20 epochs, 2 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.6932021975517273
+Training Accuracy: 0.49739041924476624
+Precision: 0.4986729025840759
+Recall: 0.9924537539482117
+F1: 0.6638065143476974
+
+==========TESTING==========
+Loss: 0.6933746933937073
+Testing Accuracy: 0.49618545174598694
+Testing Precision: 0.49808260798454285
+Testing Recall: 0.9909037351608276
+F1: 0.662936794474473
+
+
+
+
+file1: cds+
+file0: cdsf
+20 epochs, 3 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.6931554079055786
+Training Accuracy: 0.499968558549881
+Precision: 0.499968558549881
+Recall: 1.0
+F1: 0.6666387181251768
+
+==========TESTING==========
+Loss: 0.6931565403938293
+Testing Accuracy: 0.5
+Testing Precision: 0.5
+Testing Recall: 1.0
+F1: 0.6666666666666666
+
+
+
+
+file1: cds+
+file0: cdsf
+20 epochs, 4 hidden layers
+Results:
+==========TRAINING==========
+Loss: 0.6931668519973755
+Training Accuracy: 0.499968558549881
+Precision: 0.0
+Recall: 0.0
+
+
+==========TESTING==========
+Loss: 0.6931667923927307
+Testing Accuracy: 0.5
+Testing Precision: 0.0
+Testing Recall: 0.0
+
+
+file1: cds-
+file0: cdsf
+20 epochs
+Results:
+==========TRAINING==========
+Loss: 0.6952676177024841
+Training Accuracy: 0.5269445776939392
+Precision: 0.5227224230766296
+Recall: 0.6191673874855042
+
+
+==========TESTING==========
+Loss: 0.6987651586532593
+Testing Accuracy: 0.5217136144638062
+Testing Precision: 0.5186116695404053
+Testing Recall: 0.6050469279289246
+
+
+file1: cds0
+file0: cdsf
+20 epochs
+Results:
+==========TRAINING==========
+Loss: 0.706934928894043
+Training Accuracy: 0.499968558549881
+Precision: 0.0
+Recall: 0.0
+
+
+==========TESTING==========
+Loss: 0.7069333791732788
+Testing Accuracy: 0.5
+Testing Precision: 0.0
+Testing Recall: 0.0
+
+
+file1: cds+
+file0: cdsf
+20 epochs
+Results:
+==========TRAINING==========
+Loss: 0.6962537169456482
+Training Accuracy: 0.542539119720459
+Precision: 0.5491136312484741
+Recall: 0.4752861261367798
+
+
+==========TESTING==========
+Loss: 0.7016211152076721
+Testing Accuracy: 0.4998532831668854
+Testing Precision: 0.49983182549476624
+Testing Recall: 0.43603286147117615
+
+
+file1: cds+
+file0: cdsf
+20 epochs
+Results:
+==========TRAINING==========
+Loss: 0.70223468542099
+Training Accuracy: 0.5336728692054749
+Precision: 0.5705246329307556
+Recall: 0.27216702699661255
+
+
+==========TESTING==========
+Loss: 0.7099261283874512
+Testing Accuracy: 0.5058685541152954
+Testing Precision: 0.5123304724693298
+Testing Recall: 0.24383802711963654
+
+

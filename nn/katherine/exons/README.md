@@ -14,12 +14,12 @@ Table 1: Test Run
 | cds+  | cds-  |        |        |
 
 Table 2: Find # of epochs where accuracy converges and find a good learning rate
-| File1 | File0 | Train  |  Test  | Notes
-|:-----:|:------|:-------|:-------|:--------------
-| cdsi  | cdsf  |        |        |
-| cds0  | cdsf  |        |        |
-| cds+  | cdsf  |        |        |
-| cds+  | cds-  |        |        |
+| File1 | File0 | # hidden layers | Train  |  Test  | Notes
+|:-----:|:------|:----------------|:-------|:-------|:--------------
+| cdsi  | cdsf  |                 |        |
+| cds0  | cdsf  |                 |        |
+| cds+  | cdsf  |                 |        |
+| cds+  | cds-  |                 |        |
 
 Table 3: With dropout
 | File1 | File0 | Train  |  Test  | Notes
@@ -29,7 +29,7 @@ Table 3: With dropout
 | cds+  | cdsf  |        |        |
 | cds+  | cds-  |        |        |
 
-Table 4: With regularization (L1 or L2?)
+Table 4: With regularization (L2)
 | File1 | File0 | Train  |  Test  | Notes
 |:-----:|:------|:-------|:-------|:--------------
 | cdsi  | cdsf  |        |        |

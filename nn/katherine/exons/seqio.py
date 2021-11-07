@@ -168,4 +168,3 @@ def conv_data(seqs):
 
 	df = pd.DataFrame(df)
 	return (df)
-

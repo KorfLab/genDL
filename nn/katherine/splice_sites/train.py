@@ -3,10 +3,12 @@
 import pandas as pd
 from tensorflow import keras
 from sklearn.model_selection import train_test_split
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import GridSearchCV
 import argparse
 
 def create_model(X, layer1=5):  # 5 is for testing
-  NN = keras.Sequential()
+ NN = keras.Sequential()
   # Hidden layer 1
   NN.add(keras.layers.Dense(layer1, input_dim = X.shape[1], activation='sigmoid'))
   #Hidden layer 2
