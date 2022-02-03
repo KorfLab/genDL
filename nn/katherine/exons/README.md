@@ -1,6 +1,8 @@
 README for MLP on exon data
 ==================================
 
+https://docs.google.com/spreadsheets/d/1Ypf9xdPy8QfgjeERtAtTTkGh_gKopHCuiYGZxK3fRhQ/edit?usp=sharing
+
 ## Performance ##
 
 Topology: 153 -> 15 -> 10 -> 1
