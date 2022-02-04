@@ -34,23 +34,23 @@ arg = parser.parse_args()
 if arg.val:
 	X, y, xv, yv = prep.val_split(arg.true, arg.fake, arg.val)
 	print(X.shape)
-	X = X.reshape(X.shape[0],42,4,1)
-	xv = xv.reshape(xv.shape[0],42,4,1)
+	X = X.reshape(X.shape[0],51,4,1)
+	xv = xv.reshape(xv.shape[0],51,4,1)
 	print(X.shape)
 
 model = tf.keras.Sequential()
-model.add(tf.keras.layers.Conv2D(300, (5,1), activation='elu', 
-	input_shape=(42, 4, 1), 
+model.add(tf.keras.layers.Conv2D(600, (5,2), activation='elu', 
+	input_shape=(51, 4, 1), 
 	kernel_regularizer=tf.keras.regularizers.l2(1e-2)))
 model.add(tf.keras.layers.Dropout(0.50))
 model.add(tf.keras.layers.MaxPooling2D((2, 1)))
 
-model.add(tf.keras.layers.Conv2D(150, (4,2), activation='elu',
+model.add(tf.keras.layers.Conv2D(300, (4,1), activation='elu',
 	kernel_regularizer=tf.keras.regularizers.l2(1e-2)))
 model.add(tf.keras.layers.Dropout(0.50))
 model.add(tf.keras.layers.MaxPooling2D((2, 1)))
 
-model.add(tf.keras.layers.Conv2D(60, (4,3), activation='elu',
+model.add(tf.keras.layers.Conv2D(120, (4,2), activation='elu',
 	kernel_regularizer=tf.keras.regularizers.l2(1e-2)))
 model.add(tf.keras.layers.Dropout(0.50))
 model.add(tf.keras.layers.MaxPooling2D((2, 1)))

@@ -90,9 +90,9 @@ if __name__ == '__main__':
 	arg = parser.parse_args()
 
 	assert(os.path.isdir('/'.join((os.getcwd(), 'one_hot'))))
-	assert(arg.type == 'acceptor' or arg.type == 'donor')
-	assert(arg.level == 'hi' or arg.level == 'lo' or arg.level == 'hilo' or
-	arg.level == 'fake')
+	#assert(arg.type == 'acceptor' or arg.type == 'donor')
+	#assert(arg.level == 'hi' or arg.level == 'lo' or arg.level == 'hilo' or
+	#arg.level == 'fake')
 
 	if arg.stop - arg.start == arg.window:
 		data_set = one_hotter(arg.seqs, arg.number, arg.window, arg.start, arg.stop)
