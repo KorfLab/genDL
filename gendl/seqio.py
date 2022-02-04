@@ -3,6 +3,18 @@ import random
 import sys
 import pandas as pd
 
+dna_int = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
+
+def dna2int(seq):
+	"""
+	Convert dna alphabet to categorical integers
+	"""
+	
+	intseq = list()
+	for nt in seq: inseq.append(dna_int[nt])
+	
+	return np.array(intseq, dtype=np.uint8)
+
 def linereader(filename):
 	"""
 	*Generator that returns files line by line with minimal memory*
@@ -80,6 +92,28 @@ def fasta2onehot(file, label):
 		s += str(label)
 		data.append(s)
 	return data
+
+def seq2features(seqs=None, num=None, start=0, stop=-1, label=None, seed=1):
+	"""
+	Converts sequences stored in fasta format into one-hot feature matrix
+	"""
+	random.seed(seed)
+	sequences = fasta2onehot(seqs, label)
+	random.shuffle(sequences)
+	
+	if num == -1: num = len(sequences)
+	
+	array = np.zeros((num, stop-start, 4), dtype=np.float64)
+	for i, seq in enumerate(sequences[:num]):
+		seq = seq[:-1]
+		seq = dna2int(seq)
+		encoded = keras.utils.to_categorical(
+			seq[start:stop],
+			num_classes=4,
+			dtype=np.float64
+		)
+	
+	return array
 
 def fasta2binary(file, label):
 	"""
