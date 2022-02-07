@@ -22,12 +22,14 @@ The base donor concensus is GTrrg. That means that the GT will be
 produced 100% of the time and the other letters will follow purine,
 purine, guanine with some mismatches allowed (see code).
 
++ obs - canonical donor site consensus -- GTrrg
 + ex1 - donor sites where the rrg is AAg or GGg (perfect A and G)
 + ex2 - donor sites where the rrg is aag or ggg (as above but imperfect)
 
 The base acceptor concensus is tttcAG. The AG is produced 100% of the
 time, but the other positions allow mismatches.
 
++ obs -- canonical acceptor site -- tttcAG
 + ex3 - acceptor sites with TTTC or CTTT (perfect)
 + ex4 - acceptor sites with tttc or cttt (imperfect)
 + ex5 - acceptor sites with TTNC or NTTC (perfect, but slides 1 bp)
