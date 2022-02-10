@@ -1,15 +1,11 @@
 README for CNN Models
 ==================================
 
-The code here is inspired by the following tutorial:
+Results can also be found here:
 
-https://machinelearningmastery.com/pytorch-tutorial-develop-deep-learning-models
+https://docs.google.com/spreadsheets/d/1Ypf9xdPy8QfgjeERtAtTTkGh_gKopHCuiYGZxK3fRhQ/edit#gid=65807425
 
 ## Performance ##
-
-The `run.pl` script runs the `3lp.py` program on the fabricated data
-with several different network topologies. The topology of the network
-didn't matter that much, so these are all 168->168->168->1.
 
 | File1            |  File0  |  CNN   |  MLP   |   PWM  | Notes
 |:----------------:|:-------:|:------:|:------:|:------:|:--------------
