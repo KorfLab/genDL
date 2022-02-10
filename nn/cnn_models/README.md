@@ -12,7 +12,7 @@ with several different network topologies. The topology of the network
 didn't matter that much, so these are all 168->168->168->1.
 
 | File1            |  File0  |  CNN   |  MLP   |   PWM  | Notes
-|:----------------:|:-------:|:------:|:------:|:------:|
+|:----------------:|:-------:|:------:|:------:|:------:|:--------------
 | d.obs            | don.not | 0.825  | 0.8344 | 0.8263 |
 | d.obs.rearranged | don.not | 0.958  | 0.9725 |        |
 | d.ex1            | don.not | 0.935  | 0.9188 | 0.8906 |
