@@ -131,6 +131,8 @@ if __name__ == '__main__':
 		metavar='<int>', help='number of times to run [%(default)i]')
 	parser.add_argument('--seed', required=False, type=int,
 		help='set random seed')
+	parser.add_argument('--save', required=False, type=str, metavar='<path>',
+		help='where to save the model', default=None)
 	arg = parser.parse_args()
 	
 	if arg.seed: torch.manual_seed(1)
@@ -161,6 +163,8 @@ if __name__ == '__main__':
 		acc, f1 = evaluate_model(test_dl, model)
 		sys.stderr.write(f'{acc:.3f}\n')
 		accs.append(acc)
+	
+	if arg.save != None: torch.save(model.state_dict(), arg.save)
 	
 	# report aggregate performance
 	print(arg.file1, arg.file0, arg.layers, arg.rate, arg.momentum,
