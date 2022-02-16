@@ -2,6 +2,8 @@ import gzip
 import random
 import sys
 import pandas as pd
+import numpy as np
+from tensorflow import keras
 
 dna_int = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
 
@@ -11,7 +13,7 @@ def dna2int(seq):
 	"""
 	
 	intseq = list()
-	for nt in seq: inseq.append(dna_int[nt])
+	for nt in seq: intseq.append(dna_int[nt])
 	
 	return np.array(intseq, dtype=np.uint8)
 
@@ -67,7 +69,7 @@ def read_fasta(filename):
 			seqs.append(line)
 	yield(name, ''.join(seqs))
 
-def fasta2onehot(file, label):
+def fasta2onehot(file, label, start=None, stop=None):
 	"""
 	*Converts sequences stored in fasta format into one-hot encoded data*
 
@@ -83,6 +85,8 @@ def fasta2onehot(file, label):
 	data = []
 	for name, seq in read_fasta(file):
 		s = ''
+		if start != None and stop != None: seq = seq[start:stop]
+		#print(seq)
 		for nt in seq:
 			if   nt == 'A': s += '1000'
 			elif nt == 'C': s += '0100'
@@ -90,6 +94,7 @@ def fasta2onehot(file, label):
 			elif nt == 'T': s += '0001'
 			else: raise()
 		s += str(label)
+		#print(s)
 		data.append(s)
 	return data
 
@@ -97,21 +102,24 @@ def seq2features(seqs=None, num=None, start=0, stop=-1, label=None, seed=1):
 	"""
 	Converts sequences stored in fasta format into one-hot feature matrix
 	"""
+	
+	sequences = [seq for name, seq in read_fasta(seqs)]
 	random.seed(seed)
-	sequences = fasta2onehot(seqs, label)
 	random.shuffle(sequences)
 	
 	if num == -1: num = len(sequences)
 	
 	array = np.zeros((num, stop-start, 4), dtype=np.float64)
 	for i, seq in enumerate(sequences[:num]):
-		seq = seq[:-1]
+		#print(seq)
 		seq = dna2int(seq)
 		encoded = keras.utils.to_categorical(
 			seq[start:stop],
 			num_classes=4,
 			dtype=np.float64
 		)
+		
+		array[i,:,:] = encoded
 	
 	return array
 

@@ -84,7 +84,7 @@ def prepare_data(path, split):
 def train_model(train_dl, model, r, m):
 	criterion = BCELoss() # or CrossEntropyLoss, MSELoss
 	optimizer = SGD(model.parameters(), lr=r, momentum=m) # or Adam
-	for epoch in range(100):
+	for epoch in range(50):
 		for i, (inputs, targets) in enumerate(train_dl): # mini batches
 			optimizer.zero_grad() # clear the gradients
 			yhat = model(inputs) # compute the model output
@@ -155,7 +155,7 @@ if __name__ == '__main__':
 	# train, test, evaluate model
 	accs = []
 	for i in range(arg.iter):
-		train_dl, test_dl = prepare_data(csv, 0.5)
+		train_dl, test_dl = prepare_data(csv, 0.25)
 		model = MLP(size, arg.layers)
 		train_model(train_dl, model, arg.rate, arg.momentum)
 		acc, f1 = evaluate_model(test_dl, model)
