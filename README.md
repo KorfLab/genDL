@@ -8,6 +8,7 @@ typical PWM methods using neural networks and other methods.
 
 * arch - archive of old stuff, don't modify
 * data - raw data files and scripts for managing/generating data files
+* data42 - 42 bp sequence sets of donor and acceptor sites
 * docs - tutorial, API
 * gendl - shared libraries (include in PYTHONPATH)
 * nn - neural network experiments
