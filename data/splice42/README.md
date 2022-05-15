@@ -1,44 +1,11 @@
-README for strawman directory
-=============================
+README for splice42
+===================
 
-## Fabricated Data ##
 
-+ 2021-01-05
-+ Fabricated data files from repository
-+ --xvalid 4 (default)
-+ --seed 1
+Results with various models
+---------------------------
 
-Example command line
-
-	python3 strawman.py --file0 ../../data/acc.not.fa.gz --seed 1 --file1 ../../data/acc.ex6.fa.gz
-
-Results
-
-| file1   | file0   | accuracy | pwm info| notes
-|:--------|:--------|:---------|:--------|:--------
-| don.obs | don.not |  0.8263  |  6.2386 |
-| don.ex1 | don.not |  0.8906  |  7.1415 |
-| don.ex2 | don.not |  0.8243  |  6.2073 |
-| acc.obs | acc.not |  0.9175  |  8.5820 |
-| acc.ex3 | acc.not |  0.9922  | 10.0112 | too easy
-| acc.ex4 | acc.not |  0.8894  |  7.3852 |
-| acc.ex5 | acc.not |  0.9685  |  8.9148 |
-| acc.ex6 | acc.not |  0.8483  |  6.8941 |
-
-## Real Data ##
-
-From `datacore/project_gendl`
-
-+ n1-3: negative models 1-3, see datacore
-+ pwm: strawman.py
-+ wam1: wam.py --order 1
-+ wam2: wam.py --order 2
-+ wam3: wam.py --order 3
-+ mlp1: mlp.py --layers 168 1
-+ mlp2: mlp.py --layers 168 42 1
-+ 3lp: 3lp.py --layer2 84 --layer3 42
-
-| spe | f1  | f0 | pwm  | wam1 | wam2 | wam3 | mlp1 | mlp2 |  3lp |
+| spe | f1  | f0 | pwm  | wam1 | wam2 | wam3 | per  | per2 |  3lp |
 |:---:|:---:|:--:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
 | at  | don | n1 | 94.5 | 95.6 | 95.9 | 96.0 | 94.9 | 94.9 | 94.7 |
 | at  | don | n2 | 89.4 | 91.7 | 92.2 | 92.1 | 89.6 | 91.0 | 89.6 |
