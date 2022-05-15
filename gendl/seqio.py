@@ -3,7 +3,7 @@ import random
 import sys
 import pandas as pd
 import numpy as np
-from tensorflow import keras
+#from tensorflow import keras
 
 dna_int = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
 
@@ -11,10 +11,10 @@ def dna2int(seq):
 	"""
 	Convert dna alphabet to categorical integers
 	"""
-	
+
 	intseq = list()
 	for nt in seq: intseq.append(dna_int[nt])
-	
+
 	return np.array(intseq, dtype=np.uint8)
 
 def linereader(filename):
@@ -98,17 +98,19 @@ def fasta2onehot(file, label, start=None, stop=None):
 		data.append(s)
 	return data
 
+'''
+please move this function elsewhere
 def seq2features(seqs=None, num=None, start=0, stop=-1, label=None, seed=1):
 	"""
 	Converts sequences stored in fasta format into one-hot feature matrix
 	"""
-	
+
 	sequences = [seq for name, seq in read_fasta(seqs)]
 	random.seed(seed)
 	random.shuffle(sequences)
-	
+
 	if num == -1: num = len(sequences)
-	
+
 	array = np.zeros((num, stop-start, 4), dtype=np.float64)
 	for i, seq in enumerate(sequences[:num]):
 		#print(seq)
@@ -118,10 +120,11 @@ def seq2features(seqs=None, num=None, start=0, stop=-1, label=None, seed=1):
 			num_classes=4,
 			dtype=np.float64
 		)
-		
+
 		array[i,:,:] = encoded
-	
+
 	return array
+'''
 
 def fasta2binary(file, label):
 	"""
