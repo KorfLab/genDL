@@ -6,6 +6,7 @@ import pandas as pd
 import random  # to shuffle rows
 import seqio
 from sklearn.model_selection import train_test_split
+import subprocess as sp
 from tensorflow import keras
 
 ## CLI
@@ -18,6 +19,7 @@ parser.add_argument("--e", required=False, type=int, metavar="<int>",
                     default=20, help="number of epochs")
 parser.add_argument("--fasta", action="store_true")
 parser.add_argument("--hidden", action="store_true")
+parser.add_argument("--datasize", required=False, type=int, metavar="<int>")
 args = parser.parse_args()
 
 def encode(infile):
@@ -55,6 +57,13 @@ def load_fasta(file1, file0):
 		for item in seqs:
 			fp.write(','.join(item))
 			fp.write('\n')
+	fp.close()
+
+	# Slice data into desired size
+	if args.datasize:
+		sp.run("ls", shell=True)
+		sp.run(f"head -{args.datasize} temp.csv > temp1.csv", shell=True)
+		csv = "temp1.csv"
 	return csv
 
 if __name__ == "__main__":
@@ -62,7 +71,7 @@ if __name__ == "__main__":
 	if args.fasta:
 		input = load_fasta(args.file1, args.file0)  # writes temp.csv to directory
 		## Load data
-		df = pd.read_csv("temp.csv")
+		df = pd.read_csv("temp1.csv")
 		#df = df.sample(frac=1, random_state=1)  # scramble rows
 		X = df.iloc[:,:-1]  # sequences
 		type(X)
@@ -111,14 +120,16 @@ if __name__ == "__main__":
 		weights = output_layer.get_weights()
 	else:
 		weights = layer1.get_weights()
-	#print(len(weights))
-	#print(len(weights[0]))
-    #print(weights[0]) # weights of input layer -> hidden
-    #print(weights[1]) # weights of hidden layer -> output
+
+	## ONLY for testing effects of data size
+	if args.datasize:
+		results = open("size_experiments.txt", "a")
+		results.write(str(args.datasize) + "\t" + str(testing_stats[1]) + "\n")
 
 	## Finish up
 	if args.fasta:
 		os.remove("temp.csv")
+		os.remove("temp1.csv")
 	if args.hidden:
 		np.savetxt("../output/"+args.file1[:-7]+'.weights.hidden.csv', weights[0], delimiter=' ', fmt='%s')
 	else:
