@@ -103,7 +103,7 @@ if __name__ == '__main__':
 	arg = parser.parse_args()
 
 	if arg.seed: random.seed(arg.seed)
-	assert(arg.order >= 1)
+	#assert(arg.order >= 1)
 
 	# read sequences and reformat
 	seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
