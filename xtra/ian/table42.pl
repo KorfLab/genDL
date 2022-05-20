@@ -16,20 +16,25 @@ my $ddir = "../../data/splice42";
 my @neg = qw(n1 n2 n3 n4);
 my @genome = qw(at ce dm);
 my @site = qw(don acc);
-my @limit = (128, 256, 512, 1024, 2048, 4096, 8192, 16384);
+my @limit = (64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384);
+my $runs = 10;
 
 foreach my $gen (@genome) {
 	foreach my $prog (@prog) {
 		foreach my $site (@site) {
-			foreach my $limit (@limit) {
-				foreach my $neg (@neg) {
-					my $f1 = "--file1 $ddir/$gen.$site.fa.gz";
-					my $f0 = "--file0 $ddir/$gen.$neg$site.fa.gz";
-					my $n = "--limit $limit";
-					my $cli = "$exec{$prog} $f1 $f0 $n\n";
-				#	print STDERR $cli;
-					my $acc = `$cli`;
-					print join("\t", $gen, $prog, $site, $limit, $neg, $acc);
+			foreach my $neg (@neg) {
+				foreach my $limit (@limit) {
+					my $total = 0;
+					for (my $i = 0; $i < $runs; $i++) {
+						my $f1 = "--file1 $ddir/$gen.$site.fa.gz";
+						my $f0 = "--file0 $ddir/$gen.$neg$site.fa.gz";
+						my $n = "--limit $limit";
+						my $cli = "$exec{$prog} $f1 $f0 $n\n";
+						my $acc = `$cli`;
+						$total += $acc;
+					}
+					my $ave = $total / $runs;
+					print join("\t", $gen, $prog, $site, $limit, $neg, $ave), "\n";
 				}
 			}
 		}
