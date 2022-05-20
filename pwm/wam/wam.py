@@ -10,17 +10,17 @@ from gendl import pwm, seqio
 def make_wam(seqs, order):
 	"""
 	Function for making weight array matrix
-	
+
 	**Parameters:**
-	
+
 	+ seqs -- list of sequences (list)
 	+ order -- context of Markov model (int)
-	
+
 	**Returns:**
-	
+
 	+ weight array matrix model (position-context-letter)
 	"""
-	
+
 	length = len(seqs[0])
 
 	# create the data structures
@@ -39,7 +39,7 @@ def make_wam(seqs, order):
 				f[s][nt] = None
 		count.append(d)
 		freq.append(f)
-	
+
 	# do the actual counting
 	total = 0
 	for seq in seqs:
@@ -48,7 +48,7 @@ def make_wam(seqs, order):
 			ctx = seq[i-order:i]
 			nt = seq[i]
 			count[i][ctx][nt] += 1
-	
+
 	# convert to freqs
 	for i in range(length):
 		for ctx in count[i]:
@@ -56,32 +56,32 @@ def make_wam(seqs, order):
 			for nt in count[i][ctx]:
 				if tot == 0: freq[i][ctx][nt] = 0 # maybe None
 				else: freq[i][ctx][nt] = count[i][ctx][nt] / tot
-	
+
 	return freq
 
 
 def score_wam(wam, order, seq):
 	"""
 	Function for scoring weight array matrix
-	
+
 	**Parameters:**
-	
+
 	+ wam -- weight array matrix (position-context-letter)
 	+ order -- context of Markov model (int)
 	+ seq -- sequence (str)
-	
+
 	**Returns:**
-	
+
 	+ weight array matrix model
 	"""
-	
+
 	p = 1
 	for i in range(order, len(seq)):
 		ctx = seq[i-order:i]
 		nt = seq[i]
 		p *= wam[i][ctx][nt]
 	return p
-	
+
 
 if __name__ == '__main__':
 
@@ -95,8 +95,11 @@ if __name__ == '__main__':
 		metavar='<int>', help='order of Markov model [%(default)i]')
 	parser.add_argument('--xvalid', required=False, type=int, default=4,
 		metavar='<int>', help='x-fold cross-validation [%(default)s]')
+	parser.add_argument('--limit', required=False, type=int,
+		metavar='<int>', help='limit the data set size by this amount')
 	parser.add_argument('--seed', required=False, type=int,
 		metavar='<int>', help='random seed')
+	parser.add_argument('--noisy', action='store_true', help='see progress')
 	arg = parser.parse_args()
 
 	if arg.seed: random.seed(arg.seed)
@@ -105,8 +108,9 @@ if __name__ == '__main__':
 	# read sequences and reformat
 	seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
 	seqs0 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
-	seqs = seqs1 + seqs0
-	random.shuffle(seqs) # just in case for real data
+	if arg.limit: seqs = seqs1[:arg.limit] + seqs0[:arg.limit]
+	else:         seqs = seqs1 + seqs0
+	random.shuffle(seqs)
 
 	# cross-validation splitting
 	accs = []
@@ -133,6 +137,6 @@ if __name__ == '__main__':
 				else:               fp += 1
 		acc = (tp + tn) / (tp + tn + fp + fn)
 		accs.append(acc)
-		print(tp, tn, fp, fn, acc)
+		if arg.noisy: print(tp, tn, fp, fn, acc, file=sys.stderr)
 
 	print(statistics.mean(accs))
