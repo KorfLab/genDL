@@ -31,10 +31,10 @@ class CSVDataset(Dataset):
 
 	def __init__(self, path):
 		df = read_csv(path, header=None) # load the csv file as a dataframe
-		self.X = df.values[:, :-1] # store the inputs 
+		self.X = df.values[:, :-1] # store the inputs
 		self.y = df.values[:, -1]  # and outputs
 		self.X = self.X.astype('float32') # ensure input data is floats
-		self.y = LabelEncoder().fit_transform(self.y) # label target 
+		self.y = LabelEncoder().fit_transform(self.y) # label target
 		self.y = self.y.astype('float32') # ensure floats
 		self.y = self.y.reshape((len(self.y), 1))
 
@@ -53,14 +53,14 @@ class MLP(Module):
 
 	def __init__(self, n_inputs, layers):
 		super(MLP, self).__init__()
-		
+
 		self.hidden = ModuleList()
 		self.act = ModuleList()
 		for i in range(1, len(layers)):
 			input = layers[i-1]
 			output = layers[i]
 			self.hidden.append(Linear(input, output))
-		
+
 		for i in range(len(self.hidden) -1):
 			kaiming_uniform_(self.hidden[i].weight, nonlinearity='relu')
 			self.act.append(ReLU())
@@ -102,7 +102,7 @@ def evaluate_model(test_dl, model):
 		yhat = yhat.round() # round to class values
 		predictions.append(yhat) # store
 		actuals.append(actual)
-	
+
 	predictions, actuals = vstack(predictions), vstack(actuals)
 	acc = accuracy_score(actuals, predictions)
 	f1 = f1_score(actuals, predictions, average='weighted')
@@ -129,31 +129,35 @@ if __name__ == '__main__':
 		metavar='<float>', help='momentum [%(default)f]')
 	parser.add_argument('--iter', required=False, type=int, default=4,
 		metavar='<int>', help='number of times to run [%(default)i]')
+	parser.add_argument('--limit', required=False, type=int,
+		metavar='<int>', help='limit the data set size by this amount')
 	parser.add_argument('--seed', required=False, type=int,
 		help='set random seed')
+	parser.add_argument('--noisy', action='store_true', help='see progress')
 	parser.add_argument('--save', required=False, type=str, metavar='<path>',
 		help='where to save the model', default=None)
 	arg = parser.parse_args()
-	
+
 	if arg.seed: torch.manual_seed(1)
-	
+
 	# read fasta files and convert to a single one-hot encoded csv
 	s1 = seqio.fasta2onehot(arg.file1, 1)
-	s2 = seqio.fasta2onehot(arg.file0, 0)
-	seqs = s1 + s2
+	s0 = seqio.fasta2onehot(arg.file0, 0)
+	if arg.limit: seqs = s1[:arg.limit] + s0[:arg.limit]
+	else:         seqs = s1 + s0
 	random.shuffle(seqs)
-	csv = 'temp.csv'
+	csv = f'temp.{os.getpid()}.csv'
 	with open(csv, 'w') as fp:
 		for item in seqs:
 			fp.write(','.join(item))
 			fp.write('\n')
 	size = len(s1[0]) -1 # length of sequence
-	
+
 	# check network architecture
 	if len(arg.layers) < 2: raise Exception('need at least 2 layers')
 	if arg.layers[0] != size: raise Exception('input layer != inputs')
 	if arg.layers[-1] != 1: raise Exception('last layer must be 1')
-	
+
 	# train, test, evaluate model
 	accs = []
 	for i in range(arg.iter):
@@ -161,13 +165,11 @@ if __name__ == '__main__':
 		model = MLP(size, arg.layers)
 		train_model(train_dl, model, arg.rate, arg.momentum)
 		acc, f1 = evaluate_model(test_dl, model)
-		sys.stderr.write(f'{acc:.3f}\n')
+		if arg.noisy: sys.stderr.write(f'{acc:.3f}\n')
 		accs.append(acc)
-	
+
 	if arg.save != None: torch.save(model.state_dict(), arg.save)
-	
+
 	# report aggregate performance
-	print(arg.file1, arg.file0, arg.layers, arg.rate, arg.momentum,
-		statistics.mean(accs))
+	print(statistics.mean(accs))
 	os.remove(csv)
-	

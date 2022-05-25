@@ -16,8 +16,11 @@ if __name__ == '__main__':
 		metavar='<file>', help='fasta file of not observed sites')
 	parser.add_argument('--xvalid', required=False, type=int, default=4,
 		metavar='<int>', help='x-fold cross-validation [%(default)s]')
+	parser.add_argument('--limit', required=False, type=int,
+		metavar='<int>', help='limit the data set size by this amount')
 	parser.add_argument('--seed', required=False, type=int,
 		metavar='<int>', help='random seed')
+	parser.add_argument('--noisy', action='store_true', help='see progress')
 	arg = parser.parse_args()
 
 	if arg.seed: random.seed(arg.seed)
@@ -25,8 +28,9 @@ if __name__ == '__main__':
 	# read sequences and reformat
 	seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
 	seqs0 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
-	seqs = seqs1 + seqs0
-	random.shuffle(seqs) # just in case for real data
+	if arg.limit: seqs = seqs1[:arg.limit] + seqs0[:arg.limit]
+	else:         seqs = seqs1 + seqs0
+	random.shuffle(seqs)
 
 	# cross-validation splitting
 	accs = []
@@ -56,6 +60,6 @@ if __name__ == '__main__':
 		h = pwm.entropy(tpwm)
 		accs.append(acc)
 		hs.append(h)
-		print(tp, tn, fp, fn, acc, h)
+		if arg.noisy: print(tp, tn, fp, fn, acc, h, file=sys.stderr)
 
-	print(statistics.mean(accs), statistics.mean(hs))
+	print(statistics.mean(accs))
