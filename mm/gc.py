@@ -5,37 +5,33 @@ import sys
 
 from gendl import pwm, seqio
 
-def make_mm(seqs, k):
-	count = {}
+def make_gc(seqs):
+	count = {'AT': 0, 'CG': 0}
 	total = 0
 	for seq in seqs:
-		for i in range(len(seq) -k + 1):
-			kmer = seq[i:i+k]
-			if kmer not in count: count[kmer] = 0
-			count[kmer] += 1
+		for nt in seq:
+			if nt == 'A' or nt == 'T': count['AT'] += 1
+			else:                      count['CG'] += 1
 			total += 1
 	freq = {}
-	for kmer in count:
-		freq[kmer] = count[kmer] / total
+	for nt in count:
+		freq[nt] = count[nt] / total
 	return freq
 
-def score_mm(mm, seq, k):
+def score_gc(gc, seq):
 	score = 1
-	for i in range(len(seq) -k +1):
-		kmer = seq[i:i+k]
-		score *= mm[kmer]
+	for nt in seq:
+		if nt == 'A' or nt == 'T': score *= gc['AT']
+		else:                      score *= gc['CG']
 	return score
-
 
 # CLI
 parser = argparse.ArgumentParser(
-	description='Evaluate the performance of simple Markov model')
-parser.add_argument('--file1', required=True, type=str,
+	description='Evaluate GC for exons/introns')
+parser.add_argument('--exons', required=True, type=str,
 	metavar='<file>', help='fasta file of observed sites')
-parser.add_argument('--file0', required=True, type=str,
+parser.add_argument('--introns', required=True, type=str,
 	metavar='<file>', help='fasta file of not observed sites')
-parser.add_argument('--k', required=False, type=int, default=4,
-	metavar='<int>', help='kmer size [%(default)i]')
 parser.add_argument('--xvalid', required=False, type=int, default=4,
 	metavar='<int>', help='x-fold cross-validation [%(default)s]')
 parser.add_argument('--seed', required=False, type=int,
@@ -45,10 +41,10 @@ arg = parser.parse_args()
 if arg.seed: random.seed(arg.seed)
 
 # read sequences and reformat
-seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
-seqs0 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
+seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.exons)]
+seqs0 = [(0, seq) for name, seq in seqio.read_fasta(arg.introns)]
 seqs = seqs1 + seqs0
-random.shuffle(seqs) # just in case for real data
+random.shuffle(seqs)
 
 # cross-validation splitting
 accs = []
@@ -58,15 +54,17 @@ for train, test in seqio.cross_validation(seqs, arg.xvalid):
 	# make pwms from seqs
 	trues = [seq for label, seq in train if label == 1]
 	fakes = [seq for label, seq in train if label == 0]
-	tmm = make_mm(trues, arg.k)
-	fmm = make_mm(fakes, arg.k)
+	tm = make_gc(trues)
+	fm = make_gc(fakes)
+	
+	print(tm)
 
 	# score vs. test set
 	tp, tn, fp, fn = 0, 0, 0, 0
 	for entry in test:
 		label, seq = entry
-		tscore = score_mm(tmm, seq, arg.k)
-		fscore = score_mm(fmm, seq, arg.k)
+		tscore = score_gc(tm, seq)
+		fscore = score_gc(fm, seq)
 
 		if label == 1:
 			if tscore > fscore: tp += 1
