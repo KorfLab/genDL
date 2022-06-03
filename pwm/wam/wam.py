@@ -1,4 +1,3 @@
-
 import argparse
 import itertools
 import random
@@ -83,60 +82,59 @@ def score_wam(wam, order, seq):
 	return p
 
 
-if __name__ == '__main__':
+# CLI
+parser = argparse.ArgumentParser(
+	description='Evaluate the performance of a WAM method')
+parser.add_argument('--file1', required=True, type=str,
+	metavar='<file>', help='fasta file of observed sites')
+parser.add_argument('--file0', required=True, type=str,
+	metavar='<file>', help='fasta file of not observed sites')
+parser.add_argument('--order', required=False, type=int, default=1,
+	metavar='<int>', help='order of Markov model [%(default)i]')
+parser.add_argument('--xvalid', required=False, type=int, default=4,
+	metavar='<int>', help='x-fold cross-validation [%(default)s]')
+parser.add_argument('--limit', required=False, type=int,
+	metavar='<int>', help='limit the data set size by this amount')
+parser.add_argument('--seed', required=False, type=int,
+	metavar='<int>', help='random seed')
+parser.add_argument('--noisy', action='store_true', help='see progress')
+arg = parser.parse_args()
 
-	parser = argparse.ArgumentParser(
-		description='Evaluate the performance of a WAM method')
-	parser.add_argument('--file1', required=True, type=str,
-		metavar='<file>', help='fasta file of observed sites')
-	parser.add_argument('--file0', required=True, type=str,
-		metavar='<file>', help='fasta file of not observed sites')
-	parser.add_argument('--order', required=False, type=int, default=1,
-		metavar='<int>', help='order of Markov model [%(default)i]')
-	parser.add_argument('--xvalid', required=False, type=int, default=4,
-		metavar='<int>', help='x-fold cross-validation [%(default)s]')
-	parser.add_argument('--limit', required=False, type=int,
-		metavar='<int>', help='limit the data set size by this amount')
-	parser.add_argument('--seed', required=False, type=int,
-		metavar='<int>', help='random seed')
-	parser.add_argument('--noisy', action='store_true', help='see progress')
-	arg = parser.parse_args()
+if arg.seed: random.seed(arg.seed)
+#assert(arg.order >= 1)
 
-	if arg.seed: random.seed(arg.seed)
-	#assert(arg.order >= 1)
+# read sequences and reformat
+seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
+seqs0 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
+if arg.limit: seqs = seqs1[:arg.limit] + seqs0[:arg.limit]
+else:         seqs = seqs1 + seqs0
+random.shuffle(seqs)
 
-	# read sequences and reformat
-	seqs1 = [(1, seq) for name, seq in seqio.read_fasta(arg.file1)]
-	seqs0 = [(0, seq) for name, seq in seqio.read_fasta(arg.file0)]
-	if arg.limit: seqs = seqs1[:arg.limit] + seqs0[:arg.limit]
-	else:         seqs = seqs1 + seqs0
-	random.shuffle(seqs)
+# cross-validation splitting
+accs = []
+for train, test in seqio.cross_validation(seqs, arg.xvalid):
 
-	# cross-validation splitting
-	accs = []
-	for train, test in seqio.cross_validation(seqs, arg.xvalid):
+	# make pwms from seqs
+	trues = [seq for label, seq in train if label == 1]
+	fakes = [seq for label, seq in train if label == 0]
+	twam = make_wam(trues, arg.order)
+	fwam = make_wam(fakes, arg.order)
 
-		# make pwms from seqs
-		trues = [seq for label, seq in train if label == 1]
-		fakes = [seq for label, seq in train if label == 0]
-		twam = make_wam(trues, arg.order)
-		fwam = make_wam(fakes, arg.order)
+	# score vs. test set
+	tp, tn, fp, fn = 0, 0, 0, 0
+	for entry in test:
+		label, seq = entry
+		tscore = score_wam(twam, arg.order, seq)
+		fscore = score_wam(fwam, arg.order, seq)
 
-		# score vs. test set
-		tp, tn, fp, fn = 0, 0, 0, 0
-		for entry in test:
-			label, seq = entry
-			tscore = score_wam(twam, arg.order, seq)
-			fscore = score_wam(fwam, arg.order, seq)
+		if label == 1:
+			if tscore > fscore: tp += 1
+			else:               fn += 1
+		else:
+			if fscore > tscore: tn += 1
+			else:               fp += 1
+	acc = (tp + tn) / (tp + tn + fp + fn)
+	accs.append(acc)
+	if arg.noisy: print(tp, tn, fp, fn, acc, file=sys.stderr)
 
-			if label == 1:
-				if tscore > fscore: tp += 1
-				else:               fn += 1
-			else:
-				if fscore > tscore: tn += 1
-				else:               fp += 1
-		acc = (tp + tn) / (tp + tn + fp + fn)
-		accs.append(acc)
-		if arg.noisy: print(tp, tn, fp, fn, acc, file=sys.stderr)
-
-	print(statistics.mean(accs))
+print(statistics.mean(accs))

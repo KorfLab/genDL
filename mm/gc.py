@@ -57,7 +57,8 @@ for train, test in seqio.cross_validation(seqs, arg.xvalid):
 	tm = make_gc(trues)
 	fm = make_gc(fakes)
 	
-	print(tm)
+	#print(tm)
+	#print(fm)
 
 	# score vs. test set
 	tp, tn, fp, fn = 0, 0, 0, 0
